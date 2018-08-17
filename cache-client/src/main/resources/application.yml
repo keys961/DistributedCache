@@ -7,3 +7,7 @@ server:
 spring:
   application:
     name: cache-client
+
+feign:
+  hystrix:
+    enabled: true
