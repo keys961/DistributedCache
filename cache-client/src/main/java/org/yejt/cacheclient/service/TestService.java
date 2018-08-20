@@ -16,7 +16,7 @@ public class TestService
     private TestClient client;
 
     @GetMapping("/hello")
-    public String sayHello(@RequestParam(name = "name") String name, HttpServletRequest request)
+    public String sayHello(@RequestParam(name = "name") String name)
     {
         return client.sayHello(name);
     }
