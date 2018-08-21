@@ -1,23 +1,34 @@
-package org.yejt.cacheclient.utils;
+package org.yejt.cacheroute.route;
 
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.loadbalancer.ILoadBalancer;
-import com.netflix.loadbalancer.IRule;
 import com.netflix.loadbalancer.Server;
 import com.netflix.niws.loadbalancer.DiscoveryEnabledServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.yejt.cacheroute.utils.ConsistentHash;
 
-import java.util.*;
+import java.util.List;
+import java.util.TreeMap;
 
-public class DHTLoadBalancer implements IRule
+public class DHTLoadBalancerRule implements LoadBalancerRule
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DHTLoadBalancerRule.class);
 
     private int virtualNodeCount;
 
     private ILoadBalancer iLoadBalancer;
 
-    public DHTLoadBalancer()
+    public DHTLoadBalancerRule()
     {
         this.virtualNodeCount = 1;
+    }
+
+    public DHTLoadBalancerRule(int virtualNodeCount)
+    {
+        this.virtualNodeCount = 1;
+        if(virtualNodeCount > 0)
+            this.virtualNodeCount = virtualNodeCount;
     }
 
     @Override
@@ -26,13 +37,12 @@ public class DHTLoadBalancer implements IRule
         // TODO: o is null... may be using Zuul
         // o is the K of K-V..
         // it may refined to String...
-        System.err.println(o);
-        
+        LOGGER.info("Load balancer key: {}.", o);
+        LOGGER.info("Virtual nodes count: {}", virtualNodeCount);
         if(o == null)
             return null;
 
         int hashVal = ConsistentHash.getHash(o.toString());
-
 
         TreeMap<Integer, Server> serverMap = new TreeMap<>();
         List<Server> serverList = iLoadBalancer.getReachableServers();
@@ -84,5 +94,4 @@ public class DHTLoadBalancer implements IRule
             return serverMap.get(ceilKey);
         return null;
     }
-
 }

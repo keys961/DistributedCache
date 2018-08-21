@@ -10,6 +10,7 @@
         <module name="cache-client" />
         <module name="cache-demo" />
         <module name="cache-registry" />
+        <module name="cache-route" />
         <module name="cache-service" />
       </profile>
     </annotationProcessing>
@@ -18,6 +19,7 @@
       <module name="cache-client" target="1.8" />
       <module name="cache-demo" target="1.8" />
       <module name="cache-registry" target="1.8" />
+      <module name="cache-route" target="1.8" />
       <module name="cache-service" target="1.8" />
     </bytecodeTargetLevel>
   </component>

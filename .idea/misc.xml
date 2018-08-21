@@ -8,6 +8,7 @@
         <option value="$PROJECT_DIR$/cache-service/pom.xml" />
         <option value="$PROJECT_DIR$/cache-client/pom.xml" />
         <option value="$PROJECT_DIR$/cache-demo/pom.xml" />
+        <option value="$PROJECT_DIR$/cache-route/pom.xml" />
       </list>
     </option>
   </component>

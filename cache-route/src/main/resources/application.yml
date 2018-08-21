@@ -1,0 +1,19 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:20000/eureka
+server:
+  port: 8080
+
+spring:
+  application:
+    name: cache-route
+
+zuul:
+  routes:
+    cache-service:
+      path: /cache-service/**
+      serviceId: cache-service
+
+load-balance:
+  virtual-node: 10

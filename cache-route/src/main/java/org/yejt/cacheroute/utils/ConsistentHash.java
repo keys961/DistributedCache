@@ -1,6 +1,4 @@
-package org.yejt.cacheclient.utils;
-
-import java.util.List;
+package org.yejt.cacheroute.utils;
 
 public class ConsistentHash
 {
@@ -26,6 +24,4 @@ public class ConsistentHash
 
         return hash;
     }
-
-
 }
