@@ -31,12 +31,12 @@ public class DHTLoadBalancerRule implements LoadBalancerRule
             this.virtualNodeCount = virtualNodeCount;
     }
 
+    /**
+     * TODO: Server list is global, updated by another thread/schedule
+     */
     @Override
     public Server choose(Object o)
     {
-        // TODO: o is null... may be using Zuul
-        // o is the K of K-V..
-        // it may refined to String...
         LOGGER.info("Load balancer key: {}.", o);
         LOGGER.info("Virtual nodes count: {}", virtualNodeCount);
         if(o == null)

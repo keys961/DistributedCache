@@ -2,13 +2,42 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:20000/eureka/
+
 server:
   port: 8765
+
 spring:
   application:
     name: cache-client
 
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 2000
 
 feign:
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true
   hystrix:
     enabled: true
+
+xxcache:
+  route-name: cache-route
+  service-prefix: /cache-service
+  client:
+    readTimeout: 2000
+    connectTimeout: 2000
+    writeTimeout: 5000
+    pool:
+      maxIdleConnection: 10
+      keepAliveDuration: 300
+
+
+

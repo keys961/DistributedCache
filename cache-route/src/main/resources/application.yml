@@ -9,6 +9,14 @@ spring:
   application:
     name: cache-route
 
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 2000
+
 zuul:
   routes:
     cache-service:
@@ -17,3 +25,11 @@ zuul:
 
 load-balance:
   virtual-node: 10
+
+ribbon:
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true
+  readTimeout: 2000
+  connectTimeout: 2000
