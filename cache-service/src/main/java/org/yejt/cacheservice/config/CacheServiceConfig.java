@@ -10,6 +10,7 @@ import org.yejt.cacheservice.service.CacheServiceBuilder;
 @Configuration
 public class CacheServiceConfig
 {
+    //TODO: build with configurations
     @Autowired
     private CacheProperties cacheProperties;
 
