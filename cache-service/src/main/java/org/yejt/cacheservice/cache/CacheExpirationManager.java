@@ -1,21 +1,21 @@
 package org.yejt.cacheservice.cache;
 
-public interface CacheExpirationManager<K>
-{
-    boolean isExpired(K key);
+import org.yejt.cacheservice.store.value.ValueHolder;
 
-    default K filter(K key)
+public interface CacheExpirationManager<K, V>
+{
+    boolean isExpired(ValueHolder<V> v);
+
+    default V filter(K key, ValueHolder<V> valueHolder)
     {
-        if(!isExpired(key))
-            return key;
+        if(key == null || valueHolder == null)
+            return null;
+        if(!isExpired(valueHolder))
+            return valueHolder.value();
+        // remove expired item
+        remove(key);
         return null;
     }
 
-    void updateTimestamp(K key);
-
-    void removeTimestamp(K key);
-
-    void clearTimestamp();
-
-    void scheduleClear();
+    void remove(K key);
 }

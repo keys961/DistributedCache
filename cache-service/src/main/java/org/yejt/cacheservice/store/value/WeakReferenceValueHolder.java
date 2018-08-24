@@ -7,9 +7,18 @@ public class WeakReferenceValueHolder<V> implements ValueHolder<V>
 {
     private final WeakReference<V> value;
 
+    private final long timestamp;
+
     public WeakReferenceValueHolder(V value)
     {
         this.value = new WeakReference<>(value);
+        timestamp = System.currentTimeMillis();
+    }
+
+    @Override
+    public long getTimestamp()
+    {
+        return timestamp;
     }
 
     @Override

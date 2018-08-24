@@ -9,11 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CacheExpirationProperties
 {
-    private long expiration;
+    private long expiration = Long.MAX_VALUE;
 
     private String strategy;
-
-    private long interval;
-
-    private long initialDelay;
 }

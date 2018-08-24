@@ -3,9 +3,7 @@ package org.yejt.cacheservice.properties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 
-@Component("cacheProperties")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,13 +11,15 @@ public class CacheProperties
 {
     private String cacheName;
 
-    private String cacheType; // basic(default), random, fifo, lru, a-lru, weak-ref
+    private String cacheType = "basic"; // basic(default), random, fifo, lru, a-lru, weak-ref
 
-    private long maxSize;
+    private long maxSize = Long.MAX_VALUE;
 
-    private CacheExpirationProperties expiration;
+    private CacheExpirationProperties expiration = new CacheExpirationProperties(
+            Long.MAX_VALUE, "noop"
+    );
 
-    private String keyClass;
+    private String keyClass = "java.lang.String";
 
     private String valueClass;
 }

@@ -10,3 +10,18 @@ eureka:
     serviceUrl:
       defaultZone: http://localhost:20000/eureka
 
+# CacheManager/Cache/CacheExpiration configurations
+xxcache:
+  name: CacheManager
+  caches:
+    - cacheName: basic-cache
+      cacheType: basic
+      expiration:
+        strategy: noop
+
+    - cacheName: alru-cache
+      cacheType: approximate_lru
+      maxSize: 1024
+      expiration:
+        expiration: 3600
+        strategy: lazy

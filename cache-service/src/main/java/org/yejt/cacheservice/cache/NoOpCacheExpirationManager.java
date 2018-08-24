@@ -1,27 +1,17 @@
 package org.yejt.cacheservice.cache;
 
-public class NoOpCacheExpirationManager<K> implements CacheExpirationManager<K>
+import org.yejt.cacheservice.store.value.ValueHolder;
+
+public class NoOpCacheExpirationManager<K, V> implements CacheExpirationManager<K, V>
 {
     @Override
-    public boolean isExpired(K key)
+    public boolean isExpired(ValueHolder<V> v)
     {
-        return true;
+        return false;
     }
 
     @Override
-    public void updateTimestamp(K key)
-    {
-        // no-ops
-    }
-
-    @Override
-    public void removeTimestamp(K key)
-    {
-        // no-ops
-    }
-
-    @Override
-    public void scheduleClear()
+    public void remove(Object key)
     {
         // no-ops
     }
