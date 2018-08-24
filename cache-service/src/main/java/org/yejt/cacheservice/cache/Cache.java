@@ -8,7 +8,6 @@ import java.util.Set;
 
 public interface Cache<K, V> extends Closeable
 {
-    //TODO: Finish cache
     V get(K key);
 
     Map<K, V> getAll(Set<? extends K> keys);

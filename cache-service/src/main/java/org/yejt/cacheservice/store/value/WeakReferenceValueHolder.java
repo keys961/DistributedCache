@@ -1,6 +1,7 @@
 package org.yejt.cacheservice.store.value;
 
 import java.lang.ref.WeakReference;
+import java.util.Objects;
 
 public class WeakReferenceValueHolder<V> implements ValueHolder<V>
 {
@@ -15,5 +16,13 @@ public class WeakReferenceValueHolder<V> implements ValueHolder<V>
     public V value()
     {
         return value.get();
+    }
+
+    @Override
+    public String toString()
+    {
+        if(value.get() == null)
+            return null;
+        return Objects.requireNonNull(value.get()).toString();
     }
 }

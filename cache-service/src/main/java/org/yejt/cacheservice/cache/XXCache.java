@@ -3,6 +3,7 @@ package org.yejt.cacheservice.cache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yejt.cacheservice.properties.CacheExpirationProperties;
 import org.yejt.cacheservice.properties.CacheProperties;
 import org.yejt.cacheservice.store.DataStore;
 import org.yejt.cacheservice.store.value.ValueHolder;
@@ -19,11 +20,15 @@ public class XXCache<K, V> implements Cache<K, V>
 
     private CacheProperties properties;
 
+    private CacheExpirationManager<K> cacheExpirationManager;
+
     private volatile boolean isClosed;
 
     public XXCache(CacheProperties properties)
     {
         this.properties = properties;
+        buildCache();
+        LOGGER.info("XXCache - Cache {} is built.", properties.getCacheName());
     }
 
     @Override
@@ -31,7 +36,16 @@ public class XXCache<K, V> implements Cache<K, V>
     {
         if(isClosed)
             throw new RuntimeException("Cache is closed.");
-        ValueHolder<V> v = dataStore.get(key);
+        K filteredKey = cacheExpirationManager.filter(key);
+        if(filteredKey == null)
+        {
+            LOGGER.info("XXCache - {}#get: key: {} is expired.", properties.getCacheName(),
+                    key);
+            return null;
+        }
+        ValueHolder<V> v = dataStore.get(filteredKey);
+        LOGGER.info("XXCache - {}#get: key: {}, value: {}.", properties.getCacheName(),
+                filteredKey, v);
         if(v == null)
             return null;
 
@@ -45,7 +59,8 @@ public class XXCache<K, V> implements Cache<K, V>
             throw new RuntimeException("Cache is closed.");
         Map<K, V> kvMap = new HashMap<>();
         keys.forEach(k -> kvMap.put(k, get(k)));
-
+        LOGGER.info("XXCache - {}#getAll: keys: {}, values: {}.", properties.getCacheName(),
+                keys, kvMap);
         return kvMap;
     }
 
@@ -54,7 +69,10 @@ public class XXCache<K, V> implements Cache<K, V>
     {
         if(isClosed)
             throw new RuntimeException("Cache is closed.");
+        cacheExpirationManager.updateTimestamp(key);
         ValueHolder<V> v = dataStore.put(key, value);
+        LOGGER.info("XXCache - {}#put: key: {}, value: {}.", properties.getCacheName(),
+                key, v);
         if(v == null)
             return null;
 
@@ -66,7 +84,10 @@ public class XXCache<K, V> implements Cache<K, V>
     {
         if(isClosed)
             throw new RuntimeException("Cache is closed.");
+        cacheExpirationManager.removeTimestamp(key);
         ValueHolder<V> v = dataStore.remove(key);
+        LOGGER.info("XXCache - {}#remove: key: {}, value: {}.", properties.getCacheName(),
+                key, v);
         if(v == null)
             return null;
 
@@ -86,7 +107,9 @@ public class XXCache<K, V> implements Cache<K, V>
     {
         if(isClosed)
             throw new RuntimeException("Cache is closed.");
+        LOGGER.warn("XXCache - {}#clear.");
         dataStore.clear();
+        cacheExpirationManager.clearTimestamp();
     }
 
     @Override
@@ -96,13 +119,14 @@ public class XXCache<K, V> implements Cache<K, V>
             return;
         isClosed = true;
         dataStore.clear();
-        dataStore = null;
+        cacheExpirationManager.clearTimestamp();
+        LOGGER.warn("XXCache - {}#clear.");
     }
 
     @Override
     public boolean isClosed()
     {
-        return false;
+        return isClosed;
     }
 
     @Override
@@ -120,6 +144,17 @@ public class XXCache<K, V> implements Cache<K, V>
     @Override
     public <T> T unwrap(Class<T> cls)
     {
-        return null;
+        if (cls.isAssignableFrom(getClass()))
+        {
+            return cls.cast(this);
+        }
+
+        throw new IllegalArgumentException("Unwapping to " + cls
+                + " is not a supported by this implementation");
+    }
+
+    protected void buildCache()
+    {
+        // TODO: build cache..
     }
 }

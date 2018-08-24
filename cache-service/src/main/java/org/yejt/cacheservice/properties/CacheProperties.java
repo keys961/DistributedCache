@@ -17,7 +17,7 @@ public class CacheProperties
 
     private long maxSize;
 
-    private long expiration; // -1: no expiration applied
+    private CacheExpirationProperties expiration;
 
     private String keyClass;
 

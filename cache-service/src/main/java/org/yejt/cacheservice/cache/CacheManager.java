@@ -7,7 +7,6 @@ import java.io.Closeable;
 
 public interface CacheManager extends Closeable
 {
-    //TODO: Finish CacheManager
     <K, V> Cache<K, V> getCache(String cacheName);
 
     Iterable<String> getCacheNames();

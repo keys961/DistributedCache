@@ -14,4 +14,12 @@ public class BaseValueHolder<V> implements ValueHolder<V>
     {
         return value;
     }
+
+    @Override
+    public String toString()
+    {
+        if(value == null)
+            return null;
+        return value.toString();
+    }
 }
