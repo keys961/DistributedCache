@@ -1,19 +1,34 @@
 package org.yejt.cacheservice.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.yejt.cacheservice.cache.Cache;
 import org.yejt.cacheservice.cache.CacheManager;
+import org.yejt.cacheservice.properties.CacheManagerProperties;
+import org.yejt.cacheservice.properties.CacheProperties;
 
-@Service
-public class CacheService
+import java.util.Optional;
+
+public interface CacheService
 {
-    //TODO: Implement the cache service
-    private CacheManager cacheManager;
+    Cache getCache(String cacheName);
 
-    @Autowired
-    public CacheService(CacheManager cacheManager)
-    {
-        this.cacheManager = cacheManager;
-        System.out.println(cacheManager.getProperties());
-    }
+    CacheManager getCacheManager();
+
+    Optional put(String cacheName, String key, Object value);
+
+    Optional get(String cacheName, String key);
+
+    Optional remove(String cacheName, String key);
+
+    CacheManagerProperties getManagerProperties();
+
+    CacheProperties getCacheProperties(String cacheName);
+
+    void close();
+
+    void close(String cacheName);
+
+    boolean isClosed();
+
+    boolean isClosed(String cacheName);
 }

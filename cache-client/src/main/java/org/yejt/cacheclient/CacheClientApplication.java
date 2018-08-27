@@ -14,9 +14,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * must be added to the upper application using this caching service
  */
 @SpringBootApplication
-@EnableDiscoveryClient
-@EnableEurekaClient
-@EnableFeignClients
 public class CacheClientApplication
 {
 

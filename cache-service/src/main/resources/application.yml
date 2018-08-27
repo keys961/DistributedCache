@@ -14,14 +14,21 @@ eureka:
 xxcache:
   name: CacheManager
   caches:
-    - cacheName: basic-cache
+    - cacheName: cache1
       cacheType: basic
       expiration:
         strategy: noop
 
-    - cacheName: alru-cache
+    - cacheName: cache2
       cacheType: approximate_lru
       maxSize: 1024
       expiration:
         expiration: 3600
+        strategy: lazy
+
+    - cacheName: cache3
+      cacheType: approximate_lru
+      maxSize: 2048
+      expiration:
+        expiration: 1800
         strategy: lazy

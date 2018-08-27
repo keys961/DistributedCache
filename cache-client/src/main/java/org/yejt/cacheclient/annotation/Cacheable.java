@@ -5,6 +5,7 @@ import org.yejt.cacheclient.condition.DefaultCacheCondition;
 import org.yejt.cacheclient.keygen.DefaultKeyGenerator;
 import org.yejt.cacheclient.keygen.KeyGenerator;
 
+import javax.validation.constraints.NotNull;
 import java.lang.annotation.*;
 
 @Target({ElementType.METHOD})
@@ -13,11 +14,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface Cacheable
 {
-    String[] cacheName() default {};
-
-    String key() default "";
-
-    long expiration() default -1L;
+    String cacheName();
 
     Class<? extends KeyGenerator> keyGenerator() default DefaultKeyGenerator.class;
 

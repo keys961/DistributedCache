@@ -4,24 +4,13 @@ import java.lang.reflect.Method;
 
 public class DefaultKeyGenerator implements KeyGenerator
 {
-    private static class Holder
-    {
-        private static DefaultKeyGenerator generator = new DefaultKeyGenerator();
-    }
-
-    private static final Object DEFAULT_KEY = new Object();
-
-    private DefaultKeyGenerator() {}
-
     @Override
-    public Object generateKey(Object target, Method method, Object... params)
+    public String generateKey(Object target, Object... params)
     {
-        return null;
-    }
+        StringBuilder stringBuilder = new StringBuilder();
+        for(Object param : params)
+            stringBuilder.append(param.toString());
 
-    @Override
-    public KeyGenerator create()
-    {
-        return Holder.generator;
+        return stringBuilder.toString();
     }
 }

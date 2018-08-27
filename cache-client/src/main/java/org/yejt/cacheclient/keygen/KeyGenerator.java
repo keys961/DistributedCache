@@ -4,7 +4,5 @@ import java.lang.reflect.Method;
 
 public interface KeyGenerator
 {
-    Object generateKey(Object target, Method method, Object... params);
-
-    KeyGenerator create();
+    String generateKey(Object target, Object... params);
 }
