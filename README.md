@@ -12,7 +12,7 @@ This project contains 4 modules:
 
 - `cache-registry`: The micro-service registry service.
 - `cache-route`: The server-side load balancing service of the cache service.
-- `cache-service`: The cache service deployed on the server to provide the cache service.
+- `cache-service`: The cache service deployed on the server provides the cache service.
 - `cache-client`: It provides the APIs and the client to access the cache service.
 
 ## Examples
