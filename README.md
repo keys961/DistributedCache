@@ -78,8 +78,7 @@ At this time, you must using Spring Cloud Eureka to register you client to the c
 
 ```java
 @SpringBootApplication
-@EnableDiscoveryClient
-@EnableEurekaClient
+@EnableDiscoveryClient/@EnableEurekaClient
 public class App {
     public static void main(String[] args) {
         SpringApplication.run(App.class, args);
@@ -129,7 +128,7 @@ public class UserRepository {
 
     @CacheRemove(cacheName = "cache1")
     public User removeUser(String username) {
-    	// ommitted...
+    	// Ommitted...
     }
 }
 ```
