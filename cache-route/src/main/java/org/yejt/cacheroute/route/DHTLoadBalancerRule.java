@@ -38,7 +38,6 @@ public class DHTLoadBalancerRule implements LoadBalancerRule
     public Server choose(Object o)
     {
         LOGGER.info("Load balancer key: {}.", o);
-        LOGGER.info("Virtual nodes count: {}", virtualNodeCount);
         if(o == null)
             return null;
 
@@ -55,12 +54,18 @@ public class DHTLoadBalancerRule implements LoadBalancerRule
             String tag = info.getIPAddr() + ":" + info.getPort() + "," + info.getAppName();
             for(int i = 0; i < virtualNodeCount; i++)
             {
-                String tTag = tag + i;
+                String tTag = "#" + i + "-" + tag;
                 serverMap.put(ConsistentHash.getHash(tTag), server);
             }
         }
 
-        return getServer(serverMap, hashVal);
+        Server server = getServer(serverMap, hashVal);
+        if(server == null)
+            LOGGER.warn("No server is chosen.");
+        else
+            LOGGER.info("Choose server {}.\n", server);
+
+        return server;
     }
 
     @Override

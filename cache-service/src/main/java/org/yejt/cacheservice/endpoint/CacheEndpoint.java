@@ -30,25 +30,25 @@ public class CacheEndpoint
     }
 
     @GetMapping(value = "/{cacheName}/{key}")
-    ResponseEntity get(@PathVariable String cacheName, @PathVariable String key)
+    Object get(@PathVariable String cacheName, @PathVariable String key)
     {
-        return ResponseEntity.ok(cacheService.get(cacheName, key).orElse(null));
+        return cacheService.get(cacheName, key).orElse(null);
     }
 
     /**
      * This method will cause cache overwritten
      */
     @PostMapping(value = "/{cacheName}/{key}")
-    ResponseEntity put(@PathVariable String cacheName, @PathVariable String key,
+    Object put(@PathVariable String cacheName, @PathVariable String key,
              @RequestBody Object value)
     {
-        return ResponseEntity.ok(cacheService.put(cacheName, key, value).orElse(null));
+        return cacheService.put(cacheName, key, value).orElse(null);
     }
 
     @DeleteMapping(value = "/{cacheName}/{key}")
-    ResponseEntity remove(@PathVariable String cacheName, @PathVariable String key)
+    Object remove(@PathVariable String cacheName, @PathVariable String key)
     {
-        return ResponseEntity.ok(cacheService.remove(cacheName, key).orElse(null));
+        return cacheService.remove(cacheName, key).orElse(null);
     }
 
     @GetMapping(value = "/props")

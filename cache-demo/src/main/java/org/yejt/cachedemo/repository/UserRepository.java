@@ -20,7 +20,7 @@ public class UserRepository
         condition = UserCacheCondition.class)
     public User addUser(User user) throws InterruptedException
     {
-        Thread.sleep(2000);
+        Thread.sleep(400);
         userMap.put(user.getUsername(), user);
 
         return user;
@@ -29,14 +29,14 @@ public class UserRepository
     @Cacheable(cacheName = "cache1", condition = UserCacheCondition.class)
     public User getUser(String username) throws InterruptedException
     {
-        Thread.sleep(2000);
+        Thread.sleep(400);
         return userMap.get(username);
     }
 
     @CacheRemove(cacheName = "cache1")
     public User removeUser(String username) throws InterruptedException
     {
-        Thread.sleep(2000);
+        Thread.sleep(400);
         return userMap.remove(username);
     }
 }

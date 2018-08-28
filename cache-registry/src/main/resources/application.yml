@@ -1,9 +1,11 @@
 server:
   port: 20000 # Registry center port
 
+# TODO: Solve Eureka self-protection problem
 eureka:
   instance:
     hostname: localhost
+    leaseRenewalIntervalInSeconds: 15
   client:
     register-with-eureka: false
     fetch-registry: false # mark itself as a center server

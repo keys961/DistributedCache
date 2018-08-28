@@ -1,30 +1,33 @@
 package org.yejt.cacheclient.aspect;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.yejt.cacheclient.annotation.CachePut;
 import org.yejt.cacheclient.annotation.CacheRemove;
 import org.yejt.cacheclient.annotation.Cacheable;
 import org.yejt.cacheclient.client.XXCacheClient;
 import org.yejt.cacheclient.condition.CacheCondition;
-import org.yejt.cacheclient.keygen.DefaultKeyGenerator;
 import org.yejt.cacheclient.keygen.KeyGenerator;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Aspect
+@Component
 public class CacheAspect
 {
     @Autowired
     private XXCacheClient cacheClient;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     private Map<Class<? extends KeyGenerator>, KeyGenerator> keyGeneratorCache
             = new ConcurrentHashMap<>();
@@ -67,10 +70,10 @@ public class CacheAspect
         }
 
         // First fetch cache
-        ResponseEntity cache = cacheClient.get(annotation.cacheName(),
+        Object cache = cacheClient.get(annotation.cacheName(),
                 keyGenerator.generateKey(joinPoint.getTarget(), params));
-        if(cache.getBody() != null)
-            return cache.getBody();
+        if(cache != null)
+            return unwrap(cache, getReturnType(joinPoint));
 
         return cachePut(joinPoint, params, keyGenerator, cacheCondition, annotation.cacheName());
     }
@@ -176,5 +179,16 @@ public class CacheAspect
     {
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
         return signature.getMethod().getAnnotation(cls);
+    }
+
+    private Class getReturnType(ProceedingJoinPoint joinPoint)
+    {
+        MethodSignature signature = (MethodSignature)joinPoint.getSignature();
+        return signature.getReturnType();
+    }
+
+    private  <T> T unwrap(Object value, Class<T> cls)
+    {
+        return mapper.convertValue(value, cls);
     }
 }

@@ -18,14 +18,23 @@ public class UserServiceRunner
     public UserServiceRunner(UserService userService)
     {
         users.add(new User("keys961", "123456"));
-        users.add(new User("keys962", "123456"));
-        users.add(new User("keys963", "123456"));
+        users.add(new User("fucker0x22", "123456"));
+        users.add(new User("asshole123bbb", "123456"));
         this.userService = userService;
         new Thread(this::runTest).start();
     }
 
     private void runTest()
     {
+        try
+        {
+            Thread.sleep(1000);
+            userService.put("test", new User("test", "test123"));
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
         while (true)
         {
             for(User user : users)

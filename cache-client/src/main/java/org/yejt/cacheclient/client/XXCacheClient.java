@@ -11,7 +11,7 @@ import org.yejt.cacheclient.client.fallback.XXCacheClientFallback;
 public interface XXCacheClient
 {
     @GetMapping(value = "/{cacheName}/{key}")
-    ResponseEntity get(@PathVariable("cacheName") String cacheName,
+    Object get(@PathVariable("cacheName") String cacheName,
                        @RequestHeader(FilterConstants.LOAD_BALANCER_KEY)
                        @PathVariable("key") String key);
 
@@ -19,13 +19,13 @@ public interface XXCacheClient
      * This method will cause cache overwritten
      */
     @PostMapping(value = "/{cacheName}/{key}")
-    ResponseEntity put(@PathVariable("cacheName") String cacheName,
+    Object put(@PathVariable("cacheName") String cacheName,
              @RequestHeader(FilterConstants.LOAD_BALANCER_KEY)
              @PathVariable("key") String key,
              @RequestBody Object value);
 
     @DeleteMapping(value = "/{cacheName}/{key}")
-    ResponseEntity remove(@PathVariable("cacheName") String cacheName,
+    Object remove(@PathVariable("cacheName") String cacheName,
                 @RequestHeader(FilterConstants.LOAD_BALANCER_KEY)
                 @PathVariable("key") String key);
 

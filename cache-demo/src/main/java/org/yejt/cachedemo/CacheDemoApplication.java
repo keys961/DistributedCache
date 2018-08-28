@@ -8,6 +8,9 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Import;
+import org.yejt.cacheclient.annotation.XXCacheAutoConfig;
+import org.yejt.cacheclient.annotation.XXCacheAutoConfiguration;
 import org.yejt.cachedemo.entity.User;
 import org.yejt.cachedemo.service.UserService;
 import org.yejt.cachedemo.service.UserServiceRunner;
@@ -17,12 +20,11 @@ import java.util.Map;
 import java.util.Set;
 
 @SpringBootApplication
+@XXCacheAutoConfiguration
 @EnableDiscoveryClient
 @EnableEurekaClient
-@EnableFeignClients
 public class CacheDemoApplication
 {
-    //TODO: fix up AOP problem
     @Autowired
     private UserServiceRunner runner;
 

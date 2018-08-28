@@ -25,7 +25,7 @@ public class FeignOkHttpConfig
     @Value("${xxcache.client.writeTimeout:5000}")
     private int writeTimeout;
 
-    @Value("${xxcache.client.pool.maxIdleConnection:10}")
+    @Value("${xxcache.client.pool.maxIdleConnection:16}")
     private int maxIdleConnection;
 
     @Value("${xxcache.client.pool.keepAliveDuration:300}")

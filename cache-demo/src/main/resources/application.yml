@@ -1,14 +1,20 @@
+# Application port
+server:
+  port: 9527
 
-
+# Register to the spring cloud cluster
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:20000/eureka/
 
+# Application name
 spring:
   application:
     name: cache-client
 
+# TODO: Optimize the style of the configuration
+# Hystrix configuration
 hystrix:
   command:
     default:
@@ -19,6 +25,7 @@ hystrix:
           thread:
             timeoutInMilliseconds: 2000
 
+# Feign client configuration
 feign:
   httpclient:
     enabled: false
@@ -27,6 +34,7 @@ feign:
   hystrix:
     enabled: true
 
+## XXCache configuration ##
 xxcache:
   route-name: cache-route
   service-prefix: /cache-service
@@ -37,5 +45,4 @@ xxcache:
     pool:
       maxIdleConnection: 10
       keepAliveDuration: 300
-server:
-  port: 9527
+
