@@ -74,7 +74,7 @@ xxcache:
 
 ### 4. Application using Cache Client
 
-At this time, you must using Spring Cloud Eureka to register you client to the cache service cluster using these 3 annotation:
+Currently, you must using Spring Cloud Eureka to register you client to the cache service cluster using these 3 annotation:
 
 ```java
 @SpringBootApplication
