@@ -14,12 +14,9 @@ public class RouteConfig
     @Value("${loadBalance.virtualNode:1}")
     private int virtualNodeCount;
 
-    @Value("${loadBalance.updateInterval:30000}")
-    private long updateInterval;
-
     @Bean
     public IRule loadBalancerRule()
     {
-        return new DHTLoadBalancerRule(virtualNodeCount, updateInterval);
+        return new DHTLoadBalancerRule(virtualNodeCount);
     }
 }
