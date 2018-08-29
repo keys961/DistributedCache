@@ -4,6 +4,10 @@ import org.yejt.cacheservice.store.container.ConcurrentLRUHashMap;
 import org.yejt.cacheservice.store.value.BaseValueHolder;
 import org.yejt.cacheservice.store.value.ValueHolder;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Approximately LRU algorithms using segment to provide
  * better performance
@@ -22,6 +26,12 @@ public class ApproximateLruDataStore<K, V> implements DataStore<K, V>
     public ValueHolder<V> get(K key)
     {
         return cache.get(key);
+    }
+
+    @Override
+    public Set<Map.Entry<K, ValueHolder<V>>> getAll()
+    {
+        return cache.entrySet();
     }
 
     @Override

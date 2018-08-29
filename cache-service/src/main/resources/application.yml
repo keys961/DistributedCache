@@ -31,4 +31,6 @@ xxcache:
       maxSize: 2048
       expiration:
         expiration: 1800
-        strategy: lazy
+        strategy: schedule
+        initDelay: 60
+        interval: 300

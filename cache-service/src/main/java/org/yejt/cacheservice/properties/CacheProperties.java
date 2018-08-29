@@ -16,7 +16,7 @@ public class CacheProperties
     private long maxSize = Long.MAX_VALUE;
 
     private CacheExpirationProperties expiration = new CacheExpirationProperties(
-            Long.MAX_VALUE, "noop"
+            Long.MAX_VALUE, "noop", 0L, 6000L
     );
 
     private String keyClass = "java.lang.String";

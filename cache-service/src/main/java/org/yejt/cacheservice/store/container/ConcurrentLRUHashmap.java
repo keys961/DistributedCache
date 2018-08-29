@@ -1,9 +1,7 @@
 package org.yejt.cacheservice.store.container;
 
 import java.io.Serializable;
-import java.util.AbstractMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -27,6 +25,8 @@ public class ConcurrentLRUHashMap<K, V> extends AbstractMap<K, V>
     private final int segmentShift;
 
     private final Segment<K, V>[] segments;
+
+    private transient Set<Map.Entry<K, V>> entrySet;
 
     public ConcurrentLRUHashMap()
     {
@@ -289,8 +289,9 @@ public class ConcurrentLRUHashMap<K, V> extends AbstractMap<K, V>
     @Override
     public Set<Entry<K, V>> entrySet()
     {
-        throw new RuntimeException("ConcurrentLRUHashMap#entrySet()" +
-                " method is not supported.");
+        Set<Map.Entry<K, V>> es = entrySet;
+        return (es != null) ?
+                es : (entrySet = new EntrySet());
     }
 
 
@@ -631,6 +632,143 @@ public class ConcurrentLRUHashMap<K, V> extends AbstractMap<K, V>
                     unlock();
                 }
             }
+        }
+    }
+
+    public class EntryIterator implements Iterator<Entry<K, V>>
+    {
+        int nextSegmentIndex;
+
+        int nextTableIndex;
+
+        HashEntry<K, V>[] currentTable;
+
+        HashEntry<K, V> nextEntry;
+
+        HashEntry<K, V> lastReturned;
+
+        EntryIterator()
+        {
+            nextSegmentIndex = segments.length - 1;
+            nextTableIndex = -1;
+            advance();
+        }
+
+        public boolean hasMoreElements()
+        {
+            return hasNext();
+        }
+
+        final void advance()
+        {
+            if (nextEntry != null && (nextEntry = nextEntry.next) != null)
+                return;
+
+            while (nextTableIndex >= 0)
+            {
+                if ((nextEntry = currentTable[nextTableIndex--]) != null)
+                    return;
+            }
+
+            while (nextSegmentIndex >= 0)
+            {
+                Segment<K, V> seg = segments[nextSegmentIndex--];
+                if (seg.count != 0)
+                {
+                    currentTable = seg.table;
+                    for (int j = currentTable.length - 1; j >= 0; --j)
+                    {
+                        if ((nextEntry = currentTable[j]) != null)
+                        {
+                            nextTableIndex = j - 1;
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        public boolean hasNext()
+        {
+            return nextEntry != null;
+        }
+
+        HashEntry<K, V> nextEntry()
+        {
+            if (nextEntry == null)
+                throw new NoSuchElementException();
+            lastReturned = nextEntry;
+            advance();
+            return lastReturned;
+        }
+
+        public void remove()
+        {
+            if (lastReturned == null)
+                throw new IllegalStateException();
+            ConcurrentLRUHashMap.this.remove(lastReturned.key);
+            lastReturned = null;
+        }
+
+        public Map.Entry<K, V> next()
+        {
+            HashEntry<K, V> e = nextEntry();
+            return new WriteThroughEntry(e.key, e.value);
+        }
+    }
+
+    @SuppressWarnings("serial")
+    final class WriteThroughEntry extends AbstractMap.SimpleEntry<K, V>
+    {
+
+        WriteThroughEntry(K k, V v)
+        {
+            super(k, v);
+        }
+
+        public V setValue(V value)
+        {
+            if (value == null)
+                throw new NullPointerException();
+            V v = super.setValue(value);
+            ConcurrentLRUHashMap.this.put(getKey(), value);
+            return v;
+        }
+    }
+
+    final class EntrySet extends AbstractSet<Entry<K, V>>
+    {
+
+        public Iterator<Map.Entry<K, V>> iterator()
+        {
+            return new EntryIterator();
+        }
+
+        public boolean contains(Object o)
+        {
+            if (!(o instanceof Map.Entry))
+                return false;
+            Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
+            V v = ConcurrentLRUHashMap.this.get(e.getKey());
+            return v != null && v.equals(e.getValue());
+        }
+
+        public boolean remove(Object o)
+        {
+            if (!(o instanceof Map.Entry))
+                return false;
+            Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
+            return ConcurrentLRUHashMap.this.remove(e.getKey(), e.getValue());
+        }
+
+        public int size()
+        {
+            return ConcurrentLRUHashMap.this.size();
+        }
+
+        public void clear()
+        {
+            ConcurrentLRUHashMap.this.clear();
         }
     }
 }

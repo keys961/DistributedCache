@@ -1,6 +1,7 @@
 package org.yejt.cacheservice.cache;
 
 import org.yejt.cacheservice.properties.CacheProperties;
+import org.yejt.cacheservice.store.DataStore;
 
 import java.io.Closeable;
 import java.util.Map;
@@ -11,6 +12,8 @@ public interface Cache<K, V> extends Closeable
     V get(K key);
 
     Map<K, V> getAll(Set<? extends K> keys);
+
+    DataStore<K, V> getDataStore();
 
     V put(K key, V value);
 

@@ -65,11 +65,13 @@ xxcache:
         strategy: lazy # Using lazy strategy to clean expiration items
 
     - cacheName: cache3
-      cacheType: approximate_lru
+      cacheType: lru # Using strictly LRU map for cache storage
       maxSize: 2048
       expiration:
         expiration: 1800
-        strategy: lazy
+        strategy: schedule # Using scheduled strategy to clean the expiration items
+        initDelay: 60 # The delay to start the 1st clean procedure in second
+        interval: 300 # The interval between 2 clean procedures in second
 ```
 
 ### 4. Application using Cache Client

@@ -37,7 +37,8 @@ public class ALruCacheTest extends CacheServiceApplicationTests
         properties2.setCacheType(CacheTypeConstants.APPROXIMATE_LRU);
         properties2.setExpiration(
                 new CacheExpirationProperties(
-                        10, CacheExpirationConstants.LAZY_STRATEGY
+                        10, CacheExpirationConstants.LAZY_STRATEGY,
+                        0L, 6000L
                 )
         );
         properties.getCaches().add(properties2);

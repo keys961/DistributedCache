@@ -3,7 +3,7 @@ package org.yejt.cacheservice.store;
 import org.yejt.cacheservice.store.value.BaseValueHolder;
 import org.yejt.cacheservice.store.value.ValueHolder;
 
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -28,49 +28,91 @@ public class FifoDataStore<K, V> implements DataStore<K, V>
     @Override
     public ValueHolder<V> get(K key)
     {
-        lock.readLock().lock();
-        ValueHolder<V> v = cache.get(key);
-        lock.readLock().unlock();
-
+        ValueHolder<V> v = null;
+        try
+        {
+            lock.readLock().lock();
+            v = cache.get(key);
+            lock.readLock().unlock();
+        }
+        finally
+        {
+            lock.readLock().unlock();
+        }
         return v;
+    }
+
+    @Override
+    public Set<Map.Entry<K, ValueHolder<V>>> getAll()
+    {
+        Set<Map.Entry<K, ValueHolder<V>>> entries = new HashSet<>();
+        try
+        {
+            lock.readLock().lock();
+            entries = cache.entrySet();
+        }
+        finally
+        {
+            lock.readLock().unlock();
+        }
+        return entries;
     }
 
     @Override
     public ValueHolder<V> put(K key, V value)
     {
-        lock.writeLock().lock();
-        if(count >= capacity)
-            removeEntry();
         ValueHolder<V> oldValue, newValue = new BaseValueHolder<>(value);
-        oldValue = cache.get(key);
-        cache.put(key, newValue);
-        if(oldValue == null)
-            count++;
-        lock.writeLock().unlock();
+        try
+        {
+            lock.writeLock().lock();
+            if (count >= capacity)
+                removeEntry();
+            oldValue = cache.get(key);
+            cache.put(key, newValue);
+            if (oldValue == null)
+                count++;
+        }
+        finally
+        {
+            lock.writeLock().unlock();
+        }
         return newValue;
     }
 
     @Override
     public ValueHolder<V> remove(K key)
     {
-        ValueHolder<V> holder;
-        lock.writeLock().lock();
+        ValueHolder<V> holder = null;
+        try
+        {
+            lock.writeLock().lock();
 
-        holder = cache.remove(key);
+            holder = cache.remove(key);
 
-        if(holder != null)
-            count--;
-        lock.writeLock().unlock();
+            if (holder != null)
+                count--;
+        }
+        finally
+        {
+            lock.writeLock().unlock();
+        }
+
         return holder;
     }
 
     @Override
     public void clear()
     {
-        lock.writeLock().lock();
-        cache.clear();
-        count = 0L;
-        lock.writeLock().unlock();
+        try
+        {
+            lock.writeLock().lock();
+            cache.clear();
+            count = 0L;
+        }
+        finally
+        {
+            lock.writeLock().unlock();
+        }
     }
 
     private void removeEntry()

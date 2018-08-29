@@ -4,6 +4,7 @@ import org.yejt.cacheservice.store.value.ValueHolder;
 import org.yejt.cacheservice.store.value.WeakReferenceValueHolder;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -18,6 +19,12 @@ public class WeakReferenceDataStore<K, V> implements DataStore<K, V>
     public ValueHolder<V> get(K key)
     {
         return cacheMap.get(key);
+    }
+
+    @Override
+    public Set<Map.Entry<K, ValueHolder<V>>> getAll()
+    {
+        return cacheMap.entrySet();
     }
 
     @Override

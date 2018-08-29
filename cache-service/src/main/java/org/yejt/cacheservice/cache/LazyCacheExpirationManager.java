@@ -23,7 +23,7 @@ public class LazyCacheExpirationManager<K, V> implements CacheExpirationManager<
     public boolean isExpired(ValueHolder<V> v)
     {
         long currentTime = System.currentTimeMillis();
-        return v.getTimestamp() < currentTime - properties.getExpiration();
+        return v.getTimestamp() < currentTime - properties.getExpiration() * 1000;
     }
 
     @Override

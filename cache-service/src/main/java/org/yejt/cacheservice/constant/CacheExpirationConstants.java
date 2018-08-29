@@ -7,4 +7,6 @@ public class CacheExpirationConstants
     public static final String NOOP_STRATEGY = "noop";
 
     public static final String LAZY_STRATEGY = "lazy";
+
+    public static final String SCHEDULE_STRATEGY = "schedule";
 }

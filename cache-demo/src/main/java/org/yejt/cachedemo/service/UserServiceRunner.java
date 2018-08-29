@@ -49,6 +49,15 @@ public class UserServiceRunner
                 }
             }
 
+            try
+            {
+                Thread.sleep(10000L);
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+
             for(int i = 0; i < 2; i++)
             {
                 for(User user : users)

@@ -4,6 +4,7 @@ import org.yejt.cacheservice.store.value.BaseValueHolder;
 import org.yejt.cacheservice.store.value.ValueHolder;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -17,6 +18,12 @@ public class BaseDataStore<K, V> implements DataStore<K, V>
     public ValueHolder<V> get(K key)
     {
         return cache.get(key);
+    }
+
+    @Override
+    public Set<Map.Entry<K, ValueHolder<V>>> getAll()
+    {
+        return cache.entrySet();
     }
 
     @Override

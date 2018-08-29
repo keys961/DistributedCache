@@ -32,7 +32,8 @@ public class CacheTest extends CacheServiceApplicationTests
         properties1.setMaxSize(Long.MAX_VALUE);
         properties1.setCacheType(CacheTypeConstants.BASIC);
         properties1.setExpiration(new CacheExpirationProperties(
-                Long.MAX_VALUE, CacheExpirationConstants.NOOP_STRATEGY
+                Long.MAX_VALUE, CacheExpirationConstants.NOOP_STRATEGY,
+                0L, 6000L
         ));
         // Approximate Lru - Lazy expirations
         CacheProperties properties2 = new CacheProperties();
@@ -41,7 +42,8 @@ public class CacheTest extends CacheServiceApplicationTests
         properties2.setCacheType(CacheTypeConstants.APPROXIMATE_LRU);
         properties2.setExpiration(
                 new CacheExpirationProperties(
-                        10, CacheExpirationConstants.LAZY_STRATEGY
+                        10, CacheExpirationConstants.LAZY_STRATEGY,
+                        0L, 6000L
                 )
         );
         properties.getCaches().add(properties1);

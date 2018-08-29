@@ -6,6 +6,7 @@ import org.yejt.cacheservice.store.value.ValueHolder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -29,12 +30,35 @@ public class BoundedBaseDataStore<K, V> implements DataStore<K, V>
     }
 
     @Override
+    public Set<Map.Entry<K, ValueHolder<V>>> getAll()
+    {
+        Set<Map.Entry<K, ValueHolder<V>>> entries;
+        try
+        {
+            lock.readLock().lock();
+            entries = cache.entrySet();
+        }
+        finally
+        {
+            lock.readLock().unlock();
+        }
+
+        return entries;
+    }
+
+    @Override
     public ValueHolder<V> get(K key)
     {
         ValueHolder<V> v;
-        lock.readLock().lock();
-        v = cache.get(key);
-        lock.readLock().unlock();
+        try
+        {
+            lock.readLock().lock();
+            v = cache.get(key);
+        }
+        finally
+        {
+            lock.readLock().unlock();
+        }
 
         return v;
     }
@@ -42,37 +66,58 @@ public class BoundedBaseDataStore<K, V> implements DataStore<K, V>
     @Override
     public ValueHolder<V> put(K key, V value)
     {
-        lock.writeLock().lock();
-        if(count >= capacity)
-            removeRandomly();
-        ValueHolder<V> oldValue, newValue = new BaseValueHolder<>(value);
-        oldValue = cache.get(key);
-        cache.put(key, newValue);
-        if(oldValue == null)
-            count++;
-        lock.writeLock().unlock();
+        ValueHolder<V> oldValue, newValue;
+        try
+        {
+            lock.writeLock().lock();
+            if (count >= capacity)
+                removeRandomly();
+            newValue = new BaseValueHolder<>(value);
+            oldValue = cache.get(key);
+            cache.put(key, newValue);
+            if (oldValue == null)
+                count++;
+        }
+        finally
+        {
+            lock.writeLock().unlock();
+        }
         return newValue;
     }
 
     @Override
     public ValueHolder<V> remove(K key)
     {
-        lock.writeLock().lock();
-        ValueHolder<V> holder = cache.remove(key);
+        ValueHolder<V> holder = null;
+        try
+        {
+            lock.writeLock().lock();
+            holder = cache.remove(key);
+            if (holder != null)
+                count--;
+        }
+        finally
+        {
+            lock.writeLock().unlock();
+        }
 
-        if(holder != null)
-            count--;
-        lock.writeLock().unlock();
         return holder;
     }
 
     @Override
     public void clear()
     {
-        lock.writeLock().lock();
-        cache.clear();
-        count = 0L;
-        lock.writeLock().unlock();
+        try
+        {
+            lock.writeLock().lock();
+            cache.clear();
+            count = 0L;
+        }
+        finally
+        {
+            lock.writeLock().unlock();
+        }
+
     }
 
     private void removeRandomly()

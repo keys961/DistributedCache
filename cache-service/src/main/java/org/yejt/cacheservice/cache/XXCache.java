@@ -92,6 +92,10 @@ public class XXCache<K, V> implements Cache<K, V>
             case CacheExpirationConstants.LAZY_STRATEGY:
                 cacheExpirationManager = new LazyCacheExpirationManager<>(dataStore, expirationProperties);
                 break;
+            case CacheExpirationConstants.SCHEDULE_STRATEGY:
+                cacheExpirationManager = new ScheduleCacheExpirationManager<>(dataStore,
+                        expirationProperties);
+                break;
             default:
                 cacheExpirationManager = new NoOpCacheExpirationManager<>();
         }
@@ -121,6 +125,12 @@ public class XXCache<K, V> implements Cache<K, V>
         LOGGER.info("XXCache - {}#getAll: keys: {}, values: {}.", properties.getCacheName(),
                 keys, kvMap);
         return kvMap;
+    }
+
+    @Override
+    public DataStore<K, V> getDataStore()
+    {
+        return this.dataStore;
     }
 
     @Override

@@ -16,7 +16,7 @@ public class UserRepository
 {
     private Map<String, User> userMap = new ConcurrentHashMap<>();
 
-    @CachePut(cacheName = "cache1", keyGenerator = UserKeyGenerator.class,
+    @CachePut(cacheName = "cache3", keyGenerator = UserKeyGenerator.class,
         condition = UserCacheCondition.class)
     public User addUser(User user) throws InterruptedException
     {
@@ -26,14 +26,14 @@ public class UserRepository
         return user;
     }
 
-    @Cacheable(cacheName = "cache1", condition = UserCacheCondition.class)
+    @Cacheable(cacheName = "cache3", condition = UserCacheCondition.class)
     public User getUser(String username) throws InterruptedException
     {
         Thread.sleep(400);
         return userMap.get(username);
     }
 
-    @CacheRemove(cacheName = "cache1")
+    @CacheRemove(cacheName = "cache3")
     public User removeUser(String username) throws InterruptedException
     {
         Thread.sleep(400);

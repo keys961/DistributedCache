@@ -3,8 +3,10 @@ package org.yejt.cacheservice.store;
 import org.yejt.cacheservice.store.value.BaseValueHolder;
 import org.yejt.cacheservice.store.value.ValueHolder;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -28,7 +30,7 @@ public class LruDataStore<K, V> implements DataStore<K, V>
             @Override
             protected boolean removeEldestEntry(Map.Entry<K, ValueHolder<V>> eldest)
             {
-                return size() >= mapCapacity;
+                return size() >= capacity;
             }
         };
     }
@@ -36,25 +38,56 @@ public class LruDataStore<K, V> implements DataStore<K, V>
     @Override
     public ValueHolder<V> get(K key)
     {
-        lock.lock();
-        ValueHolder<V> v = cache.get(key);
-        if(v != null)
+        ValueHolder<V> v;
+        try
         {
-            cache.remove(key);
-            cache.put(key, v);
+            lock.lock();
+            v = cache.get(key);
+            if (v != null)
+            {
+                cache.remove(key);
+                cache.put(key, v);
+            }
         }
-        lock.unlock();
+        finally
+        {
+            lock.unlock();
+        }
 
         return v;
     }
 
     @Override
+    public Set<Map.Entry<K, ValueHolder<V>>> getAll()
+    {
+        Set<Map.Entry<K, ValueHolder<V>>> entries = new HashSet<>();
+        try
+        {
+            lock.lock();
+            entries = cache.entrySet();
+        }
+        finally
+        {
+            lock.unlock();
+        }
+
+        return entries;
+    }
+
+    @Override
     public ValueHolder<V> put(K key, V value)
     {
-        lock.lock();
-        ValueHolder<V> holder = new BaseValueHolder<>(value);
-        cache.put(key, holder);
-        lock.unlock();
+        ValueHolder<V> holder;
+        try
+        {
+            lock.lock();
+            holder = new BaseValueHolder<>(value);
+            cache.put(key, holder);
+        }
+        finally
+        {
+            lock.unlock();
+        }
 
         return holder;
     }
@@ -62,9 +95,16 @@ public class LruDataStore<K, V> implements DataStore<K, V>
     @Override
     public ValueHolder<V> remove(K key)
     {
-        lock.lock();
-        ValueHolder<V> v = cache.remove(key);
-        lock.unlock();
+        ValueHolder<V> v;
+        try
+        {
+            lock.lock();
+            v = cache.remove(key);
+        }
+        finally
+        {
+            lock.unlock();
+        }
 
         return v;
     }
@@ -72,8 +112,14 @@ public class LruDataStore<K, V> implements DataStore<K, V>
     @Override
     public void clear()
     {
-        lock.lock();
-        cache.clear();
-        lock.unlock();
+        try
+        {
+            lock.lock();
+            cache.clear();
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 }
