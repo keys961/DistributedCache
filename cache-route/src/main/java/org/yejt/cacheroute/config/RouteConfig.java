@@ -11,18 +11,15 @@ import org.yejt.cacheroute.route.DHTLoadBalancerRule;
 @Configuration
 public class RouteConfig
 {
-    @Value("${load-balance.virtual-node:1}")
+    @Value("${loadBalance.virtualNode:1}")
     private int virtualNodeCount;
+
+    @Value("${loadBalance.updateInterval:30000}")
+    private long updateInterval;
 
     @Bean
     public IRule loadBalancerRule()
     {
-        return new DHTLoadBalancerRule(virtualNodeCount);
+        return new DHTLoadBalancerRule(virtualNodeCount, updateInterval);
     }
-
-//    @Bean
-//    public ZuulFilter preFilter()
-//    {
-//        return new LoadBalancerKeyFilter();
-//    }
 }

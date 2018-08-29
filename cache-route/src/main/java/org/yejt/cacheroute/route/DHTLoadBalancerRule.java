@@ -31,9 +31,6 @@ public class DHTLoadBalancerRule implements LoadBalancerRule
             this.virtualNodeCount = virtualNodeCount;
     }
 
-    /**
-     * TODO: Server list is global, updated by another thread/schedule
-     */
     @Override
     public Server choose(Object o)
     {
@@ -51,7 +48,7 @@ public class DHTLoadBalancerRule implements LoadBalancerRule
         for(Server server : serverList)
         {
             InstanceInfo info = ((DiscoveryEnabledServer)server).getInstanceInfo();
-            String tag = info.getIPAddr() + ":" + info.getPort() + "," + info.getAppName();
+            String tag = info.getIPAddr() + ":" + info.getPort() + "::" + info.getAppName();
             for(int i = 0; i < virtualNodeCount; i++)
             {
                 String tTag = "#" + i + "-" + tag;

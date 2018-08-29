@@ -10,9 +10,11 @@ import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 @EnableZuulProxy
 @EnableEurekaClient
 @EnableDiscoveryClient
-public class CacheRouteApplication {
+public class CacheRouteApplication
+{
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         SpringApplication.run(CacheRouteApplication.class, args);
     }
 }

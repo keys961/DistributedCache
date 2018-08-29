@@ -30,14 +30,14 @@ eureka.instance.leaseRenewalInterval: # heart beat frequency
 
 You need to start it first.
 
-### 2. Registry Route/Gateway
+### 2. Service Route/Gateway
 
 The properties that will be often configured is:
 
 ```yaml
 server.port: # server port
 eureka.client.serviceUrl.defaultZone: # registry server url
-load-balance.virtual-node: # virtual node number for the DHT algorithm
+loadBalance.virtualNode: # virtual node number for the DHT algorithm
 ribbon.readTimeout: # read timeout for forwarding request
 ribbon.connectTimeout: # connect timeout for forwarding request
 ```

@@ -23,8 +23,8 @@ zuul:
       path: /cache-service/**
       serviceId: cache-service
 
-load-balance:
-  virtual-node: 10
+loadBalance:
+  virtualNode: 10
 
 ribbon:
   httpclient:
