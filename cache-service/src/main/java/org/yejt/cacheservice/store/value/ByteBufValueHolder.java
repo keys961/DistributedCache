@@ -7,6 +7,7 @@ import org.objenesis.strategy.StdInstantiatorStrategy;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 
 public class ByteBufValueHolder<V> implements ValueHolder<V>
 {
