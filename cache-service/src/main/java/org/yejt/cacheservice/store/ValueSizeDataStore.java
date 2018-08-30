@@ -4,16 +4,14 @@ import org.yejt.cacheservice.store.value.ValueHolder;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
- *  Value-store LRU data store
- *  Strategy: LRU-Threshold
+ * Value-store SIZE data store
+ * Strategy: SIZE
  */
-public class ValueLruDataStore<K, V> implements DataStore<K, V>
+public class ValueSizeDataStore<K, V> implements DataStore<K, V>
 {
-    // TODO: Finish LRU-Threshold value-based data store
-    // max size, concurrency level (with avg size up to 2^n bytes)
+    // TODO: Finish SIZE value-based data store
 
     @Override
     public ValueHolder<V> get(K key) {
@@ -37,11 +35,6 @@ public class ValueLruDataStore<K, V> implements DataStore<K, V>
 
     @Override
     public void clear() {
-
-    }
-
-    class Segment extends ReentrantLock
-    {
 
     }
 }
