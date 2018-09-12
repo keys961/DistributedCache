@@ -25,6 +25,7 @@ zuul:
 
 loadBalance:
   virtualNode: 10
+  interval: 120000 # in millisecond
 
 ribbon:
   httpclient:
