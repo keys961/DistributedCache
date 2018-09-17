@@ -1,11 +1,14 @@
 package org.yejt.cacheclient.aspect;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.pool.KryoPool;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.objenesis.strategy.StdInstantiatorStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yejt.cacheclient.annotation.CachePut;
@@ -28,6 +31,17 @@ public class CacheAspect
 
     @Autowired
     private ObjectMapper mapper;
+
+    private static final KryoPool KRYO_POOL
+            = new KryoPool.Builder(() ->
+    {
+        Kryo kryo = new Kryo();
+        kryo.setReferences(true);
+        kryo.setRegistrationRequired(false);
+        ((Kryo.DefaultInstantiatorStrategy) kryo.getInstantiatorStrategy())
+                .setFallbackInstantiatorStrategy(new StdInstantiatorStrategy());
+        return kryo;
+    }).build();
 
     private Map<Class<? extends KeyGenerator>, KeyGenerator> keyGeneratorCache
             = new ConcurrentHashMap<>();

@@ -16,7 +16,7 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 @EnableEurekaClient
 public class CacheServiceApplication
 {
-
+    //TODO: Integrated with RabbitMQ
     public static void main(String[] args) {
         SpringApplication.run(CacheServiceApplication.class, args);
     }
