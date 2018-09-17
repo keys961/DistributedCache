@@ -1,4 +1,4 @@
-# README
+# README - `XXCache`
 
 > This is a project of distributed K-V cache (in the future it may support graph database).
 >
@@ -16,6 +16,10 @@ This project contains 4 modules:
 - `cache-client`: It provides the APIs and the client to access the cache service.
 
 ## Examples
+
+### 0. RabbitMQ
+
+Before you start `XXCache` first, you need to install RabbitMQ and run it. Erlang is needed before you install RabbitMQ.
 
 ### 1. Registry Server
 
@@ -40,6 +44,13 @@ eureka.client.serviceUrl.defaultZone: # registry server url
 loadBalance.virtualNode: # virtual node number for the DHT algorithm
 ribbon.readTimeout: # read timeout for forwarding request
 ribbon.connectTimeout: # connect timeout for forwarding request
+# Also you need to set RabbitMQ configuration
+spring:
+	rabbitmq:
+		host: # MQ host
+		username: # MQ username
+		password: # MQ password
+		# etc...
 ```
 
 You need to start it next.
@@ -73,6 +84,8 @@ xxcache:
         initDelay: 60 # The delay to start the 1st clean procedure in second
         interval: 300 # The interval between 2 clean procedures in second
 ```
+
+> You also need to configure RabbitMQ, just like the sector 2.
 
 ### 4. Application using Cache Client
 

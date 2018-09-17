@@ -3,7 +3,6 @@ package org.yejt.cacheservice;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 /**
  * This application provides the real caching functions.
@@ -13,10 +12,9 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
  * 2. client -> caching server: operate on cache
  */
 @SpringBootApplication
-@EnableEurekaClient
+@EnableDiscoveryClient
 public class CacheServiceApplication
 {
-    //TODO: Integrated with RabbitMQ
     public static void main(String[] args) {
         SpringApplication.run(CacheServiceApplication.class, args);
     }

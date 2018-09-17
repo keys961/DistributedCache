@@ -4,11 +4,16 @@ server:
 spring:
   application:
     name: cache-service
+  rabbitmq:
+    host: localhost
+    username: admin
+    password: admin
 
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:20000/eureka
+
 
 # CacheManager/Cache/CacheExpiration configurations
 xxcache:

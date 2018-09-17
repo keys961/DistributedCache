@@ -8,6 +8,10 @@ server:
 spring:
   application:
     name: cache-route
+  rabbitmq:
+    host: localhost
+    username: admin
+    password: admin
 
 hystrix:
   command:
