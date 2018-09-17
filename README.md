@@ -46,11 +46,11 @@ ribbon.readTimeout: # read timeout for forwarding request
 ribbon.connectTimeout: # connect timeout for forwarding request
 # Also you need to set RabbitMQ configuration
 spring:
-	rabbitmq:
-		host: # MQ host
-		username: # MQ username
-		password: # MQ password
-		# etc...
+  rabbitmq:
+    host: # MQ host
+    username: # MQ username
+    password: # MQ password
+    # etc...
 ```
 
 You need to start it next.
