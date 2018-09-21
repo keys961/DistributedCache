@@ -1,37 +1,52 @@
 package org.yejt.cacheservice.mq;
 
+import com.netflix.appinfo.ApplicationInfoManager;
+import com.netflix.appinfo.InstanceInfo;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.yejt.cacheservice.config.MqConfig;
 
+import javax.annotation.PostConstruct;
+
 @Component
-@EnableScheduling
-public class ClusterNodeSender
+public class ClusterNodeSender implements ApplicationRunner, DisposableBean
 {
-    // TODO: Finish send join/leave message to MQ
     @Autowired
     private AmqpTemplate template;
 
-    @Value("${server.port}")
-    private int port;
+    private InstanceInfo instanceInfo;
 
-    @Scheduled(fixedDelay = 10000L)
     public void sendAddNodeMessage()
     {
-        String message = "Hello, I'm " + port;
+        // send registry message to proxy
+        instanceInfo =
+                ApplicationInfoManager.getInstance().getInfo();
         template.convertAndSend(MqConfig.CACHE_NODE_EXCHANGE,
-                MqConfig.ADD_NODE_TOPIC, message);
+                MqConfig.ADD_NODE_TOPIC, instanceInfo);
     }
 
-    @Scheduled(initialDelay = 10000L, fixedDelay = 5000L)
     public void sendRemoveNodeMessage()
     {
-        String message = "Goodbye, I'm " + port;
+        // send remove message to proxy
         template.convertAndSend(MqConfig.CACHE_NODE_EXCHANGE,
-                MqConfig.REMOVE_NODE_TOPIC, message);
+                MqConfig.REMOVE_NODE_TOPIC, instanceInfo);
+    }
+
+    @Override
+    public void run(ApplicationArguments args)
+    {
+        sendAddNodeMessage();
+    }
+
+    @Override
+    public void destroy() throws Exception
+    {
+        sendRemoveNodeMessage();
     }
 }

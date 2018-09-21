@@ -1,45 +1,48 @@
 package org.yejt.cacheroute.utils;
 
+import com.netflix.appinfo.InstanceInfo;
 import com.netflix.loadbalancer.Server;
+import org.yejt.cacheroute.mq.ClusterNodeReceiver;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 public class ServiceMapUtils
 {
-    private static TreeMap<Integer, Server> serverTreeMap = new TreeMap<>();
+    private static TreeMap<Integer, InstanceInfo> serverTreeMap
+            = new TreeMap<>();
 
-    private static Set<Server> serverSet = new HashSet<>();
+    private static Set<InstanceInfo> serverSet = new HashSet<>();
 
-    public static TreeMap<Integer, Server> getServerTreeMap()
+    public static TreeMap<Integer, InstanceInfo> getServerTreeMap()
     {
         return serverTreeMap;
     }
 
-    public static void setServerTreeMap(TreeMap<Integer, Server> serverTreeMap)
+    public static void setServerTreeMap(TreeMap<Integer, InstanceInfo> serverTreeMap)
     {
         ServiceMapUtils.serverTreeMap = serverTreeMap;
     }
 
-    public static synchronized void addServer(Collection<Integer> hashVals, Server server)
+    public static synchronized void addServer(Collection<Integer> hashVals,
+                                              InstanceInfo server)
     {
         hashVals.forEach(i -> serverTreeMap.put(i, server));
         serverSet.add(server);
     }
 
-    public static synchronized void removeServer(Server server)
+    public static synchronized void removeServer(InstanceInfo server)
     {
-        serverTreeMap.forEach((i, s) ->
-            {
-                if(s.equals(server))
-                    serverTreeMap.remove(i);
-            });
+        serverTreeMap.entrySet().removeIf(entry -> entry.getValue().equals(server));
         serverSet.remove(server);
     }
 
-    public static Set<Server> getServerSet()
+    public static synchronized void removeServer(Set<InstanceInfo> serverSet)
+    {
+        ServiceMapUtils.serverSet.removeAll(serverSet);
+        serverSet.forEach(ServiceMapUtils::removeServer);
+    }
+
+    public static Set<InstanceInfo> getServerSet()
     {
         return serverSet;
     }

@@ -14,7 +14,6 @@ eureka:
     serviceUrl:
       defaultZone: http://localhost:20000/eureka
 
-
 # CacheManager/Cache/CacheExpiration configurations
 xxcache:
   name: CacheManager
