@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import org.yejt.cacheroute.utils.ConsistentHash;
@@ -24,7 +25,7 @@ public class ClusterNodeReceiver
     private int virtualNodes;
 
     @RabbitListener(queues = "#{mqConfig.ADD_NODE_QUEUE_NAME}")
-    public void receiveAddNode(@Payload InstanceInfo o)
+    public void receiveAddNode(@Payload InstanceInfo o, @Header long timestamp)
     {
         // registry
         HashSet<Integer> hashValSet = new HashSet<>();
@@ -37,15 +38,17 @@ public class ClusterNodeReceiver
             int hashVal = ConsistentHash.getHash(tag);
             hashValSet.add(hashVal);
         }
-        ServiceMapUtils.addServer(hashValSet, o);
-        LOGGER.info("Server added: {}.", o.getInstanceId());
+        ServiceMapUtils.addServer(hashValSet, o, timestamp);
+        LOGGER.info("Server added: {}. Timestamp: {}.", o.getInstanceId(),
+                timestamp);
     }
 
     @RabbitListener(queues = "#{mqConfig.REMOVE_NODE_QUEUE_NAME}")
-    public void receiveRemoveNode(@Payload InstanceInfo o)
+    public void receiveRemoveNode(@Payload InstanceInfo o, @Header long timestamp)
     {
         // remove
-        ServiceMapUtils.removeServer(o);
-        LOGGER.info("Server removed: {}.", o.getInstanceId());
+        ServiceMapUtils.removeServer(o, timestamp);
+        LOGGER.info("Server added: {}. Timestamp: {}.", o.getInstanceId(),
+                timestamp);
     }
 }

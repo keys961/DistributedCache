@@ -8,6 +8,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistrar;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -29,6 +30,9 @@ public class MqConfig implements RabbitListenerConfigurer
     public static final String ADD_NODE_TOPIC = "cache.node.add";
 
     public static final String REMOVE_NODE_TOPIC = "cache.node.remove";
+
+    // Producer side, multicasting hash map
+    public static final String NODE_MAP_TOPIC = "cache.node.map";
 
     @Bean
     public TopicExchange topicExchange()
@@ -81,5 +85,21 @@ public class MqConfig implements RabbitListenerConfigurer
     {
         rabbitListenerEndpointRegistrar.setMessageHandlerMethodFactory(
                 messageHandlerMethodFactory(consumerJackson2MessageConverter()));
+    }
+
+    // Producer
+    @Bean
+    public Jackson2JsonMessageConverter producerJackson2MessageConverter()
+    {
+        // sender
+        return new Jackson2JsonMessageConverter();
+    }
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory)
+    {
+        final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        rabbitTemplate.setMessageConverter(producerJackson2MessageConverter());
+        return rabbitTemplate;
     }
 }

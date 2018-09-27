@@ -64,6 +64,6 @@ public class HeartbeatSchedule
                 }
             });
 
-        ServiceMapUtils.removeServer(removedSet);
+        ServiceMapUtils.removeServerForcely(removedSet);
     }
 }

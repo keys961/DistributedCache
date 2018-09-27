@@ -7,16 +7,17 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.yejt.cacheservice.config.MqConfig;
+import org.yejt.cacheservice.utils.TimestampUtils;
 
-import javax.annotation.PostConstruct;
+import java.io.IOException;
 
 @Component
 public class ClusterNodeSender implements ApplicationRunner, DisposableBean
 {
+    private static final String TIMESTAMP = "timestamp";
+
     @Autowired
     private AmqpTemplate template;
 
@@ -28,14 +29,40 @@ public class ClusterNodeSender implements ApplicationRunner, DisposableBean
         instanceInfo =
                 ApplicationInfoManager.getInstance().getInfo();
         template.convertAndSend(MqConfig.CACHE_NODE_EXCHANGE,
-                MqConfig.ADD_NODE_TOPIC, instanceInfo);
+                MqConfig.ADD_NODE_TOPIC, instanceInfo,
+                message ->
+                {
+                    try
+                    {
+                        message.getMessageProperties().setHeader(TIMESTAMP,
+                                TimestampUtils.getTimestamp());
+                    }
+                    catch (IOException e)
+                    {
+                        message.getMessageProperties().setHeader(TIMESTAMP, 0);
+                    }
+                    return message;
+                });
     }
 
     public void sendRemoveNodeMessage()
     {
         // send remove message to proxy
         template.convertAndSend(MqConfig.CACHE_NODE_EXCHANGE,
-                MqConfig.REMOVE_NODE_TOPIC, instanceInfo);
+                MqConfig.REMOVE_NODE_TOPIC, instanceInfo,
+                message ->
+                {
+                    try
+                    {
+                        message.getMessageProperties().setHeader(TIMESTAMP,
+                                TimestampUtils.getTimestamp());
+                    }
+                    catch (IOException e)
+                    {
+                        message.getMessageProperties().setHeader(TIMESTAMP, 0);
+                    }
+                    return message;
+                });
     }
 
     @Override
