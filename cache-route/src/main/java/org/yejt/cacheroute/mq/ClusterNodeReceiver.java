@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -23,6 +24,9 @@ public class ClusterNodeReceiver
 
     @Value("${loadBalance.virtualNode:16}")
     private int virtualNodes;
+
+    @Autowired
+    private NodeMapSender nodeMapSender;
 
     @RabbitListener(queues = "#{mqConfig.ADD_NODE_QUEUE_NAME}")
     public void receiveAddNode(@Payload InstanceInfo o, @Header long timestamp)
@@ -41,6 +45,7 @@ public class ClusterNodeReceiver
         ServiceMapUtils.addServer(hashValSet, o, timestamp);
         LOGGER.info("Server added: {}. Timestamp: {}.", o.getInstanceId(),
                 timestamp);
+        nodeMapSender.sendNodeMap();
     }
 
     @RabbitListener(queues = "#{mqConfig.REMOVE_NODE_QUEUE_NAME}")
@@ -50,5 +55,6 @@ public class ClusterNodeReceiver
         ServiceMapUtils.removeServer(o, timestamp);
         LOGGER.info("Server added: {}. Timestamp: {}.", o.getInstanceId(),
                 timestamp);
+        nodeMapSender.sendNodeMap();
     }
 }

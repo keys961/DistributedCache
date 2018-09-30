@@ -1,11 +1,10 @@
 package org.yejt.cacheroute.mq;
 
 import com.netflix.appinfo.InstanceInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.yejt.cacheroute.config.MqConfig;
 import org.yejt.cacheroute.utils.ServiceMapUtils;
 
 import java.util.TreeMap;
@@ -13,7 +12,7 @@ import java.util.TreeMap;
 @Component
 public class NodeMapSender
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(NodeMapSender.class);
+    private static final String VERSION = "version";
 
     @Autowired
     private RabbitTemplate template;
@@ -24,8 +23,14 @@ public class NodeMapSender
         TreeMap<Integer, InstanceInfo> nodeMap = ServiceMapUtils.getServerTreeMap();
         long version = ServiceMapUtils.getVersion();
 
-
-
+        template.convertAndSend(MqConfig.CACHE_NODE_EXCHANGE,
+                MqConfig.NODE_MAP_TOPIC, nodeMap,
+                message ->
+                {
+                    message.getMessageProperties().setHeader(VERSION,
+                            version);
+                    return message;
+                });
     }
 
 }
