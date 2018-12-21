@@ -1,6 +1,9 @@
 package org.yejt.cacheservice.config;
 
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -18,6 +21,7 @@ import java.util.UUID;
 public class MqConfig implements RabbitListenerConfigurer
 {
     //TODO: Data migration, replication may be added in the future..
+
     // Producer side
     public static final String CACHE_NODE_EXCHANGE = "cachenode.exchange.topic";
 
@@ -25,7 +29,7 @@ public class MqConfig implements RabbitListenerConfigurer
 
     public static final String REMOVE_NODE_TOPIC = "cache.node.remove";
 
-    // Consumer side, multicasting hash map
+    // Consumer side, multi-casting hash map
     public static final String NODE_MAP_QUEUE_NAME = "p-map-" + UUID.randomUUID();
 
 

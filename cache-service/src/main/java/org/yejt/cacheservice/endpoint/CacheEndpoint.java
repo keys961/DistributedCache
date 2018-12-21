@@ -30,7 +30,7 @@ public class CacheEndpoint
     }
 
     @GetMapping(value = "/{cacheName}/{key}")
-    Object get(@PathVariable String cacheName, @PathVariable String key)
+    public Object get(@PathVariable String cacheName, @PathVariable String key)
     {
         return cacheService.get(cacheName, key).orElse(null);
     }
@@ -39,38 +39,38 @@ public class CacheEndpoint
      * This method will cause cache overwritten
      */
     @PostMapping(value = "/{cacheName}/{key}")
-    Object put(@PathVariable String cacheName, @PathVariable String key,
+    public Object put(@PathVariable String cacheName, @PathVariable String key,
              @RequestBody Object value)
     {
         return cacheService.put(cacheName, key, value).orElse(null);
     }
 
     @DeleteMapping(value = "/{cacheName}/{key}")
-    Object remove(@PathVariable String cacheName, @PathVariable String key)
+    public Object remove(@PathVariable String cacheName, @PathVariable String key)
     {
         return cacheService.remove(cacheName, key).orElse(null);
     }
 
     @GetMapping(value = "/props")
-    ResponseEntity<CacheManagerProperties> getProperties()
+    public ResponseEntity<CacheManagerProperties> getProperties()
     {
         return ResponseEntity.ok(cacheService.getManagerProperties());
     }
 
     @GetMapping(value = "/props/{cacheName}")
-    ResponseEntity<CacheProperties> getCacheProperties(@PathVariable String cacheName)
+    public ResponseEntity<CacheProperties> getCacheProperties(@PathVariable String cacheName)
     {
         return ResponseEntity.ok(cacheService.getCacheProperties(cacheName));
     }
 
     @GetMapping(value = "/isClosed")
-    ResponseEntity<Boolean> isClosed()
+    public ResponseEntity<Boolean> isClosed()
     {
         return ResponseEntity.ok(cacheService.isClosed());
     }
 
     @GetMapping(value = "/isClosed/{cacheName}")
-    ResponseEntity<Boolean> isClosed(@PathVariable String cacheName)
+    public ResponseEntity<Boolean> isClosed(@PathVariable String cacheName)
     {
         return ResponseEntity.ok(cacheService.isClosed(cacheName));
     }
