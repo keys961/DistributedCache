@@ -2,17 +2,17 @@ package org.yejt.cacheservice.store;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.yejt.cacheservice.store.container.ConcurrentLRUHashMap;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 public class ConcurrentLruMapTest
 {
-    private ConcurrentHashMap<Integer, String> map =
-            new ConcurrentHashMap<>();
+    private ConcurrentLRUHashMap<Integer, String> map =
+            new ConcurrentLRUHashMap<>();
 
     @Test
     public void test()
@@ -22,6 +22,6 @@ public class ConcurrentLruMapTest
 
         Logger.getGlobal().info(set.toString());
 
-        Assert.assertEquals(10, set.size());
+        Assert.assertEquals(9, set.size());
     }
 }
