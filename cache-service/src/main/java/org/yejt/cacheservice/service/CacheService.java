@@ -1,6 +1,5 @@
 package org.yejt.cacheservice.service;
 
-import org.springframework.stereotype.Service;
 import org.yejt.cacheservice.cache.Cache;
 import org.yejt.cacheservice.cache.CacheManager;
 import org.yejt.cacheservice.properties.CacheManagerProperties;

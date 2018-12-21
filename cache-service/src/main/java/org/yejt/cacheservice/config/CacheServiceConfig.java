@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.yejt.cacheservice.cache.CacheManager;
 import org.yejt.cacheservice.cache.XXCacheManager;
 import org.yejt.cacheservice.properties.CacheManagerProperties;
-import org.yejt.cacheservice.service.CacheService;
 
 @Configuration
 public class CacheServiceConfig

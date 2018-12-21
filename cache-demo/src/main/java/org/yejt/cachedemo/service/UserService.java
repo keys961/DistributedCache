@@ -2,7 +2,6 @@ package org.yejt.cachedemo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.yejt.cachedemo.annotation.Log;
 import org.yejt.cachedemo.entity.User;
 import org.yejt.cachedemo.repository.UserRepository;

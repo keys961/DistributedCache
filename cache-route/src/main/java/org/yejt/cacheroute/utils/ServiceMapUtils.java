@@ -1,8 +1,6 @@
 package org.yejt.cacheroute.utils;
 
 import com.netflix.appinfo.InstanceInfo;
-import com.netflix.loadbalancer.Server;
-import org.yejt.cacheroute.mq.ClusterNodeReceiver;
 
 import java.util.*;
 

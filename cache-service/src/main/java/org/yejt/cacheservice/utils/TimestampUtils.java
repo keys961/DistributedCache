@@ -1,7 +1,6 @@
 package org.yejt.cacheservice.utils;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 

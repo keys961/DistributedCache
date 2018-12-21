@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface MigrationService<K, V>
 {
-    public void migrateTo(Map<K, V> data, InstanceInfo server); //TO
+    void migrateTo(Map<K, V> data, InstanceInfo server); //TO
 
-    public void migrateFrom(Map<K, V> data); // FROM
+    void migrateFrom(Map<K, V> data); // FROM
 }

@@ -7,7 +7,6 @@ import org.yejt.cacheservice.cache.CacheManager;
 import org.yejt.cacheservice.properties.CacheManagerProperties;
 import org.yejt.cacheservice.properties.CacheProperties;
 
-import javax.annotation.PostConstruct;
 import java.util.Optional;
 
 @Service

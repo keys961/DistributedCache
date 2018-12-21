@@ -4,7 +4,6 @@ import org.yejt.cacheservice.store.container.ConcurrentLRUHashMap;
 import org.yejt.cacheservice.store.value.BaseValueHolder;
 import org.yejt.cacheservice.store.value.ValueHolder;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 

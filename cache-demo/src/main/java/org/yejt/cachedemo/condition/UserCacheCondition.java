@@ -9,10 +9,7 @@ public class UserCacheCondition implements CacheCondition
     public boolean condition(Object result, Object... params)
     {
         User user = (User)result;
-        if(user == null || user.getUsername()== null ||
-                "keys961".equals(user.getUsername()))
-            return false;
-
-        return true;
+        return user != null && user.getUsername() != null &&
+                !"keys961".equals(user.getUsername());
     }
 }

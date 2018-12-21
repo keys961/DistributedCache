@@ -1,24 +1,18 @@
 package org.yejt.cacheroute.schedule;
 
 import com.netflix.appinfo.InstanceInfo;
-import com.netflix.loadbalancer.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 import org.yejt.cacheroute.utils.ServiceMapUtils;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 

@@ -2,7 +2,6 @@ package org.yejt.cacheclient.client;
 
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.yejt.cacheclient.client.fallback.XXCacheClientFallback;
 

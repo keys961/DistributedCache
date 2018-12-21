@@ -3,7 +3,6 @@ package org.yejt.cacheservice.store.value;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class ByteBufValueHolderTest

@@ -6,7 +6,6 @@ import com.netflix.loadbalancer.Server;
 import com.netflix.niws.loadbalancer.DiscoveryEnabledServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.yejt.cacheroute.mq.ClusterNodeReceiver;
 import org.yejt.cacheroute.utils.ConsistentHash;
 import org.yejt.cacheroute.utils.ServiceMapUtils;
 

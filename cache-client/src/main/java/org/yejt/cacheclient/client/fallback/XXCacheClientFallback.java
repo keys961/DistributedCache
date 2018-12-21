@@ -2,7 +2,6 @@ package org.yejt.cacheclient.client.fallback;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.yejt.cacheclient.client.XXCacheClient;
 

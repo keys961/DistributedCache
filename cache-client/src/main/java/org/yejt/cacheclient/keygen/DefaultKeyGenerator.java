@@ -1,7 +1,5 @@
 package org.yejt.cacheclient.keygen;
 
-import java.lang.reflect.Method;
-
 public class DefaultKeyGenerator implements KeyGenerator
 {
     @Override

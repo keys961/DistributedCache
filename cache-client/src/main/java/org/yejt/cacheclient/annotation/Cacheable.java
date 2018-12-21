@@ -5,7 +5,6 @@ import org.yejt.cacheclient.condition.DefaultCacheCondition;
 import org.yejt.cacheclient.keygen.DefaultKeyGenerator;
 import org.yejt.cacheclient.keygen.KeyGenerator;
 
-import javax.validation.constraints.NotNull;
 import java.lang.annotation.*;
 
 @Target({ElementType.METHOD})
