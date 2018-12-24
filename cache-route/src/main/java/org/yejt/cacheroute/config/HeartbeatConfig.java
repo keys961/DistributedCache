@@ -2,19 +2,14 @@ package org.yejt.cacheroute.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class HeartbeatConfig
 {
     @Bean
-    public RestTemplate restTemplate()
+    public WebClient heartBeatWebClient()
     {
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(2000);
-        factory.setReadTimeout(2000);
-
-        return new RestTemplate(factory);
+        return WebClient.create();
     }
 }

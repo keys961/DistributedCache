@@ -26,7 +26,6 @@ public class XXCache<K, V> implements Cache<K, V>
 
     private volatile boolean isClosed;
 
-    // TODO: Optimize the cache speed..
     public XXCache(CacheProperties properties)
     {
         this.properties = properties;

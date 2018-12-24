@@ -5,17 +5,17 @@ import com.netflix.appinfo.InstanceInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
-@Controller
+@RestController
 public class StatusEndpoint
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(StatusEndpoint.class);
 
     @GetMapping(value = "/health")
-    public ResponseEntity health()
+    public Mono<Integer> health()
     {
         try
         {
@@ -23,19 +23,19 @@ public class StatusEndpoint
             switch(myInfo.getStatus())
             {
                 case UP:
-                    return ResponseEntity.ok().build();
+                    return Mono.just(HttpStatus.OK.value());
                 case STARTING:
-                    return ResponseEntity.noContent().build();
+                    return Mono.just(HttpStatus.NO_CONTENT.value());
                 case OUT_OF_SERVICE:
-                    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+                    return Mono.just(HttpStatus.SERVICE_UNAVAILABLE.value());
                 default:
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                    return Mono.just(HttpStatus.INTERNAL_SERVER_ERROR.value());
             }
         }
         catch (Throwable var2)
         {
             LOGGER.error("Error when doing health check.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return Mono.just(HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
     }
 }

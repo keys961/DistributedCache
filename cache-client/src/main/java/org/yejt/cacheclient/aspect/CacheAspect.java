@@ -1,27 +1,27 @@
 package org.yejt.cacheclient.aspect;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.pool.KryoPool;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.objenesis.strategy.StdInstantiatorStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yejt.cacheclient.annotation.CachePut;
 import org.yejt.cacheclient.annotation.CacheRemove;
 import org.yejt.cacheclient.annotation.Cacheable;
 import org.yejt.cacheclient.client.XXCacheClient;
+import org.yejt.cacheclient.codec.CacheCodec;
 import org.yejt.cacheclient.condition.CacheCondition;
 import org.yejt.cacheclient.keygen.KeyGenerator;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
+//TODO: add codec
 @Aspect
 @Component
 public class CacheAspect
@@ -32,22 +32,14 @@ public class CacheAspect
     @Autowired
     private ObjectMapper mapper;
 
-    private static final KryoPool KRYO_POOL
-            = new KryoPool.Builder(() ->
-    {
-        Kryo kryo = new Kryo();
-        kryo.setReferences(true);
-        kryo.setRegistrationRequired(false);
-        ((Kryo.DefaultInstantiatorStrategy) kryo.getInstantiatorStrategy())
-                .setFallbackInstantiatorStrategy(new StdInstantiatorStrategy());
-        return kryo;
-    }).build();
+    private ThreadLocal<Map<Class<? extends KeyGenerator>, KeyGenerator>> keyGeneratorCache
+            = ThreadLocal.withInitial(HashMap::new);
 
-    private Map<Class<? extends KeyGenerator>, KeyGenerator> keyGeneratorCache
-            = new ConcurrentHashMap<>();
+    private ThreadLocal<Map<Class<? extends CacheCondition>, CacheCondition>> conditionCache
+            = ThreadLocal.withInitial(HashMap::new);
 
-    private Map<Class<? extends CacheCondition>, CacheCondition> conditionCache
-            = new ConcurrentHashMap<>();
+    private ThreadLocal<Map<Class<? extends CacheCodec>, CacheCodec>> codecCache
+            = ThreadLocal.withInitial(HashMap::new);
 
     @Pointcut(value = "@annotation(org.yejt.cacheclient.annotation.Cacheable)")
     public void cacheable() {}
@@ -60,29 +52,12 @@ public class CacheAspect
 
     @Around(value = "cacheable()")
     public Object cacheableAspect(ProceedingJoinPoint joinPoint)
-            throws IllegalAccessException, InstantiationException
+            throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException
     {
         Cacheable annotation = getAnnotation(joinPoint, Cacheable.class);
         Object[] params = joinPoint.getArgs();
-        KeyGenerator keyGenerator = null;
-        CacheCondition cacheCondition = null;
-
-        if(keyGeneratorCache.containsKey(annotation.keyGenerator()))
-            keyGenerator = keyGeneratorCache.get(annotation.keyGenerator());
-        else
-        {
-            keyGenerator = annotation.keyGenerator().newInstance();
-            keyGeneratorCache.put(annotation.keyGenerator(), keyGenerator);
-        }
-
-        if(conditionCache.containsKey(annotation.condition()))
-            cacheCondition = conditionCache.get(annotation.condition());
-        else
-        {
-            cacheCondition = annotation.condition().newInstance();
-            conditionCache.put(annotation.condition(), cacheCondition);
-        }
-
+        KeyGenerator keyGenerator = getAndCacheKeyGenerator(annotation.keyGenerator());
+        CacheCondition cacheCondition = getAndCacheCondition(annotation.condition());
         // First fetch cache
         Object cache = cacheClient.get(annotation.cacheName(),
                 keyGenerator.generateKey(joinPoint.getTarget(), params));
@@ -94,28 +69,13 @@ public class CacheAspect
 
     @Around(value = "cachePut()")
     public Object cachePutAspect(ProceedingJoinPoint joinPoint)
-            throws IllegalAccessException, InstantiationException
+            throws IllegalAccessException, InstantiationException,
+            NoSuchMethodException, InvocationTargetException
     {
         CachePut annotation = getAnnotation(joinPoint, CachePut.class);
         Object[] params = joinPoint.getArgs();
-        KeyGenerator keyGenerator = null;
-        CacheCondition cacheCondition = null;
-
-        if(keyGeneratorCache.containsKey(annotation.keyGenerator()))
-            keyGenerator = keyGeneratorCache.get(annotation.keyGenerator());
-        else
-        {
-            keyGenerator = annotation.keyGenerator().newInstance();
-            keyGeneratorCache.put(annotation.keyGenerator(), keyGenerator);
-        }
-
-        if(conditionCache.containsKey(annotation.condition()))
-            cacheCondition = conditionCache.get(annotation.condition());
-        else
-        {
-            cacheCondition = annotation.condition().newInstance();
-            conditionCache.put(annotation.condition(), cacheCondition);
-        }
+        KeyGenerator keyGenerator = getAndCacheKeyGenerator(annotation.keyGenerator());
+        CacheCondition cacheCondition = getAndCacheCondition(annotation.condition());
 
         return cachePut(joinPoint, params, keyGenerator, cacheCondition, annotation.cacheName());
     }
@@ -124,29 +84,15 @@ public class CacheAspect
 
     @Around("cacheRemove()")
     public Object cacheRemoveAspect(ProceedingJoinPoint joinPoint)
-            throws IllegalAccessException, InstantiationException
+            throws IllegalAccessException, InstantiationException,
+            NoSuchMethodException, InvocationTargetException
     {
         CacheRemove annotation = getAnnotation(joinPoint, CacheRemove.class);
         Object[] params = joinPoint.getArgs();
-        KeyGenerator keyGenerator = null;
-        CacheCondition cacheCondition = null;
-
-        if(keyGeneratorCache.containsKey(annotation.keyGenerator()))
-            keyGenerator = keyGeneratorCache.get(annotation.keyGenerator());
-        else
-        {
-            keyGenerator = annotation.keyGenerator().newInstance();
-            keyGeneratorCache.put(annotation.keyGenerator(), keyGenerator);
-        }
-
-        if(conditionCache.containsKey(annotation.condition()))
-            cacheCondition = conditionCache.get(annotation.condition());
-        else
-        {
-            cacheCondition = annotation.condition().newInstance();
-            conditionCache.put(annotation.condition(), cacheCondition);
-        }
-
+        KeyGenerator keyGenerator = getAndCacheKeyGenerator(annotation.keyGenerator());
+        CacheCondition cacheCondition = getAndCacheCondition(annotation.condition());
+        if(keyGenerator == null || cacheCondition == null)
+            return null;
         Object result = null;
         try
         {
@@ -164,6 +110,40 @@ public class CacheAspect
                 return null;
             return result;
         }
+    }
+
+    private KeyGenerator getAndCacheKeyGenerator(Class<? extends KeyGenerator> clazz)
+            throws IllegalAccessException, InstantiationException,
+            NoSuchMethodException, InvocationTargetException
+    {
+        KeyGenerator keyGenerator;
+        Map<Class<? extends KeyGenerator>, KeyGenerator> keyGeneratorHashMap
+                = keyGeneratorCache.get();
+        if(keyGeneratorHashMap.containsKey(clazz))
+            keyGenerator = keyGeneratorCache.get().get(clazz);
+        else
+        {
+            keyGenerator = clazz.getDeclaredConstructor().newInstance();
+            keyGeneratorHashMap.put(clazz, keyGenerator);
+        }
+
+        return keyGenerator;
+    }
+
+    private CacheCondition getAndCacheCondition(Class<? extends CacheCondition> clazz)
+            throws NoSuchMethodException, IllegalAccessException,
+            InvocationTargetException, InstantiationException
+    {
+        CacheCondition cacheCondition;
+        if(conditionCache.get().containsKey(clazz))
+            cacheCondition = conditionCache.get().get(clazz);
+        else
+        {
+            cacheCondition = clazz.getDeclaredConstructor().newInstance();
+            conditionCache.get().put(clazz, cacheCondition);
+        }
+
+        return cacheCondition;
     }
 
     private Object cachePut(ProceedingJoinPoint joinPoint,

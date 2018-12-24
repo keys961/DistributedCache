@@ -2,11 +2,11 @@ package org.yejt.cacheservice.endpoint;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.yejt.cacheservice.properties.CacheManagerProperties;
 import org.yejt.cacheservice.properties.CacheProperties;
 import org.yejt.cacheservice.service.CacheService;
+import reactor.core.publisher.Mono;
 
 @RestController
 @SuppressWarnings("unchecked")
@@ -24,54 +24,61 @@ public class CacheEndpoint
     }
 
     @GetMapping("/hello")
-    public String sayHello(@RequestParam(value = "name", defaultValue = "fucker") String name)
+    public Mono<String> sayHello(@RequestParam(value = "name", defaultValue = "fucker") String name)
     {
-        return "hello," + name + "!" + " FROM: " + port;
+        return Mono.just("hello," + name + "!" + " FROM: " + port);
     }
 
     @GetMapping(value = "/{cacheName}/{key}")
-    public Object get(@PathVariable String cacheName, @PathVariable String key)
+    public Mono get(@PathVariable String cacheName, @PathVariable String key)
     {
-        return cacheService.get(cacheName, key).orElse(null);
+        Object cachedValue = cacheService.get(cacheName, key).orElse(null);
+        if(cachedValue == null)
+            return Mono.empty();
+        return Mono.just(cachedValue);
     }
 
     /**
      * This method will cause cache overwritten
      */
     @PostMapping(value = "/{cacheName}/{key}")
-    public Object put(@PathVariable String cacheName, @PathVariable String key,
-             @RequestBody Object value)
+    public Mono put(@PathVariable String cacheName, @PathVariable String key,
+             @RequestBody Mono valuePublisher)
     {
-        return cacheService.put(cacheName, key, value).orElse(null);
+        return Mono.create(emitter -> valuePublisher.subscribe(value ->
+                cacheService.put(cacheName, key, value).ifPresent(emitter::success)));
     }
 
     @DeleteMapping(value = "/{cacheName}/{key}")
-    public Object remove(@PathVariable String cacheName, @PathVariable String key)
+    public Mono remove(@PathVariable String cacheName, @PathVariable String key)
     {
-        return cacheService.remove(cacheName, key).orElse(null);
+        Object cachedValue = cacheService.remove(cacheName, key).orElse(null);
+        if(cachedValue == null)
+            return Mono.empty();
+        return Mono.just(cachedValue);
     }
 
     @GetMapping(value = "/props")
-    public ResponseEntity<CacheManagerProperties> getProperties()
+    public Mono<CacheManagerProperties> getProperties()
     {
-        return ResponseEntity.ok(cacheService.getManagerProperties());
+        return Mono.just(cacheService.getManagerProperties());
     }
 
     @GetMapping(value = "/props/{cacheName}")
-    public ResponseEntity<CacheProperties> getCacheProperties(@PathVariable String cacheName)
+    public Mono<CacheProperties> getCacheProperties(@PathVariable String cacheName)
     {
-        return ResponseEntity.ok(cacheService.getCacheProperties(cacheName));
+        return Mono.just(cacheService.getCacheProperties(cacheName));
     }
 
     @GetMapping(value = "/isClosed")
-    public ResponseEntity<Boolean> isClosed()
+    public Mono<Boolean> isClosed()
     {
-        return ResponseEntity.ok(cacheService.isClosed());
+        return Mono.just(cacheService.isClosed());
     }
 
     @GetMapping(value = "/isClosed/{cacheName}")
-    public ResponseEntity<Boolean> isClosed(@PathVariable String cacheName)
+    public Mono<Boolean> isClosed(@PathVariable String cacheName)
     {
-        return ResponseEntity.ok(cacheService.isClosed(cacheName));
+        return Mono.just(cacheService.isClosed(cacheName));
     }
 }

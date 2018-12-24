@@ -5,11 +5,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.yejt.cacheroute.utils.ServiceMapUtils;
 
 import java.net.URI;
@@ -23,7 +22,7 @@ public class HeartbeatSchedule
     private static final Logger LOGGER = LoggerFactory.getLogger(HeartbeatSchedule.class);
 
     @Autowired
-    private RestTemplate restTemplate;
+    private WebClient heartBeatClient;
 
     private static final String PATH = "/health";
 
@@ -31,9 +30,7 @@ public class HeartbeatSchedule
     public void heartBeatSchedule()
     {
         Set<InstanceInfo> instanceInfoSet = ServiceMapUtils.getServerSet();
-
         Set<InstanceInfo> removedSet = new HashSet<>();
-
         instanceInfoSet.forEach(info ->
             {
                 String ip = info.getIPAddr();
@@ -41,9 +38,11 @@ public class HeartbeatSchedule
                 URI uri = URI.create("http://" + ip + ":" + port + PATH);
                 try
                 {
-                    ResponseEntity response = restTemplate.getForEntity(uri, Object.class);
-                    HttpStatus status = response.getStatusCode();
-                    if(status == HttpStatus.OK || status == HttpStatus.NO_CONTENT)
+                    Integer status = heartBeatClient.get().uri(uri)
+                            .retrieve()
+                            .bodyToFlux(Integer.class)
+                            .blockLast();
+                    if(status != null && (status == HttpStatus.OK.value() || status == HttpStatus.NO_CONTENT.value()))
                         LOGGER.info("Server {} is still alive.", info.getInstanceId());
                     else
                     {
@@ -57,7 +56,6 @@ public class HeartbeatSchedule
                     LOGGER.warn("Server {} is not alive.", info.getInstanceId());
                 }
             });
-
         ServiceMapUtils.removeServerForcely(removedSet);
     }
 }

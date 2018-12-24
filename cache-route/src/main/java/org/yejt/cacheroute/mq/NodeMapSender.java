@@ -17,7 +17,6 @@ public class NodeMapSender
     @Autowired
     private RabbitTemplate template;
 
-    //TODO: To spread the map to all the server..
     public void sendNodeMap()
     {
         TreeMap<Integer, InstanceInfo> nodeMap = ServiceMapUtils.getServerTreeMap();

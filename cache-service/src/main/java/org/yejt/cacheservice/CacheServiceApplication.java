@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.web.reactive.config.EnableWebFlux;
 
 /**
  * This application provides the real caching functions.
@@ -15,6 +16,7 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableEurekaClient
+@EnableWebFlux
 public class CacheServiceApplication
 {
     public static void main(String[] args)

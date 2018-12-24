@@ -4,6 +4,7 @@ import com.netflix.appinfo.InstanceInfo;
 
 import java.util.Map;
 
+//TODO: Migration service
 public interface MigrationService<K, V>
 {
     void migrateTo(Map<K, V> data, InstanceInfo server); //TO
