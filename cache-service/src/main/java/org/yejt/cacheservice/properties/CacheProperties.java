@@ -4,14 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * @author keys961
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CacheProperties
-{
+public class CacheProperties {
     private String cacheName;
 
-    private String cacheType = "basic"; // basic(default), random, fifo, lru, a-lru, weak-ref
+    /**
+     * Can be: basic(default), random, fifo, lru, a-lru, weak-ref
+     */
+    private String cacheType = "basic";
 
     private long maxSize = Long.MAX_VALUE;
 

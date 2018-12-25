@@ -1,18 +1,20 @@
 package org.yejt.cacheroute.utils;
 
-public class ConsistentHash
-{
+/**
+ * @author keys961
+ */
+public class ConsistentHash {
     /**
      * FNV1_32_Hash Algorithm
      */
-    public static int getHash(String key)
-    {
+    public static int getHash(String key) {
         final int p = 16777619;
-        int hash = (int)21661326261L;
+        int hash = (int) 21661326261L;
         byte[] bytes = key.getBytes();
 
-        for(byte b : bytes)
+        for (byte b : bytes) {
             hash = (hash ^ b) * p;
+        }
         hash += hash << 13;
         hash ^= hash >> 7;
         hash += hash << 3;

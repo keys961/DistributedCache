@@ -4,18 +4,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.yejt.cacheservice.cache.CacheManager;
-import org.yejt.cacheservice.cache.XXCacheManager;
+import org.yejt.cacheservice.cache.manager.XXCacheManager;
 import org.yejt.cacheservice.properties.CacheManagerProperties;
 
+/**
+ * @author keys961
+ */
 @Configuration
-public class CacheServiceConfig
-{
+public class CacheServiceConfig {
     @Autowired
     private CacheManagerProperties cacheProperties;
 
     @Bean
-    public CacheManager cacheManager()
-    {
+    public CacheManager cacheManager() {
         return new XXCacheManager(cacheProperties);
     }
 }

@@ -3,35 +3,37 @@ package org.yejt.cacheservice.store.value;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
 
-public class WeakReferenceValueHolder<V> implements ValueHolder<V>
-{
+/**
+ * Value holder using {@link WeakReference}.
+ *
+ * @param <V>: Value type
+ * @author keys961
+ */
+public class WeakReferenceValueHolder<V> implements ValueHolder<V> {
     private final WeakReference<V> value;
 
     private final long timestamp;
 
-    public WeakReferenceValueHolder(V value)
-    {
+    public WeakReferenceValueHolder(V value) {
         this.value = new WeakReference<>(value);
         timestamp = System.currentTimeMillis();
     }
 
     @Override
-    public long getTimestamp()
-    {
+    public long getTimestamp() {
         return timestamp;
     }
 
     @Override
-    public V value()
-    {
+    public V value() {
         return value.get();
     }
 
     @Override
-    public String toString()
-    {
-        if(value.get() == null)
+    public String toString() {
+        if (value.get() == null) {
             return null;
+        }
         return Objects.requireNonNull(value.get()).toString();
     }
 }

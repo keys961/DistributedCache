@@ -1,7 +1,9 @@
 package org.yejt.cacheservice.constant;
 
-public class CacheExpirationConstants
-{
+/**
+ * @author keys961
+ */
+public class CacheExpirationConstants {
     public static final long DEFAULT_EXPIRATION = Long.MAX_VALUE;
 
     public static final String NOOP_STRATEGY = "noop";

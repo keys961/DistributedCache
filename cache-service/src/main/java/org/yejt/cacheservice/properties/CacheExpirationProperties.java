@@ -4,12 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * @author keys961
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CacheExpirationProperties
-{
-    private long expiration = Long.MAX_VALUE; // in second
+public class CacheExpirationProperties {
+    /**
+     * All in second
+     */
+    private long expiration = Long.MAX_VALUE;
 
     private String strategy;
 

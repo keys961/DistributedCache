@@ -1,6 +1,6 @@
 server:
   port: 20001 # -Dserver.port=xxx
-  
+
 spring:
   application:
     name: cache-service

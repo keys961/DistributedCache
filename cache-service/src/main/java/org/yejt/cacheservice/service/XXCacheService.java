@@ -9,31 +9,32 @@ import org.yejt.cacheservice.properties.CacheProperties;
 
 import java.util.Optional;
 
+/**
+ * XXCache service
+ *
+ * @author yejt
+ */
 @Service
 public class XXCacheService implements CacheService<String, byte[]> {
     private CacheManager<String, byte[]> cacheManager;
 
     @Autowired
-    public XXCacheService(CacheManager<String, byte[]> cacheManager)
-    {
+    public XXCacheService(CacheManager<String, byte[]> cacheManager) {
         this.cacheManager = cacheManager;
     }
 
     @Override
-    public Cache<String, byte[]> getCache(String cacheName)
-    {
+    public Cache<String, byte[]> getCache(String cacheName) {
         return cacheManager.getCache(cacheName);
     }
 
     @Override
-    public CacheManager<String, byte[]> getCacheManager()
-    {
+    public CacheManager<String, byte[]> getCacheManager() {
         return cacheManager;
     }
 
     @Override
-    public Optional<byte[]> put(String cacheName, String key, byte[] value)
-    {
+    public Optional<byte[]> put(String cacheName, String key, byte[] value) {
         Cache<String, byte[]> cache = getCache(cacheName);
         if (cache == null)
             return Optional.empty();
@@ -42,8 +43,7 @@ public class XXCacheService implements CacheService<String, byte[]> {
     }
 
     @Override
-    public Optional<byte[]> get(String cacheName, String key)
-    {
+    public Optional<byte[]> get(String cacheName, String key) {
         Cache<String, byte[]> cache = getCache(cacheName);
         if (cache == null)
             return Optional.empty();
@@ -51,8 +51,7 @@ public class XXCacheService implements CacheService<String, byte[]> {
     }
 
     @Override
-    public Optional<byte[]> remove(String cacheName, String key)
-    {
+    public Optional<byte[]> remove(String cacheName, String key) {
         Cache<String, byte[]> cache = getCache(cacheName);
         if (cache == null)
             return Optional.empty();
@@ -60,41 +59,35 @@ public class XXCacheService implements CacheService<String, byte[]> {
     }
 
     @Override
-    public CacheManagerProperties getManagerProperties()
-    {
+    public CacheManagerProperties getManagerProperties() {
         return cacheManager.getProperties();
     }
 
     @Override
-    public CacheProperties getCacheProperties(String cacheName)
-    {
+    public CacheProperties getCacheProperties(String cacheName) {
         Cache cache = cacheManager.getCache(cacheName);
-        if(cache != null)
+        if (cache != null)
             return cache.getProperties();
         return null;
     }
 
     @Override
-    public void close()
-    {
+    public void close() {
         cacheManager.close();
     }
 
     @Override
-    public void close(String cacheName)
-    {
+    public void close(String cacheName) {
         cacheManager.destroyCache(cacheName);
     }
 
     @Override
-    public boolean isClosed()
-    {
+    public boolean isClosed() {
         return cacheManager.isClosed();
     }
 
     @Override
-    public boolean isClosed(String cacheName)
-    {
+    public boolean isClosed(String cacheName) {
         return cacheManager.getCache(cacheName).isClosed();
     }
 }

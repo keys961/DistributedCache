@@ -8,31 +8,32 @@ import org.yejt.cacheservice.properties.CacheProperties;
 import org.yejt.cacheservice.service.CacheService;
 import reactor.core.publisher.Mono;
 
+/**
+ * Main cache service REST API
+ *
+ * @author keys961
+ */
 @RestController
-public class CacheEndpoint
-{
+public class CacheEndpoint {
     @Value("${server.port}")
     private int port;
 
     private CacheService<String, byte[]> cacheService;
 
     @Autowired
-    public CacheEndpoint(CacheService<String, byte[]> cacheService)
-    {
+    public CacheEndpoint(CacheService<String, byte[]> cacheService) {
         this.cacheService = cacheService;
     }
 
     @GetMapping("/hello")
-    public Mono<String> sayHello(@RequestParam(value = "name", defaultValue = "fucker") String name)
-    {
+    public Mono<String> sayHello(@RequestParam(value = "name", defaultValue = "fucker") String name) {
         return Mono.just("hello," + name + "!" + " FROM: " + port);
     }
 
     @GetMapping(value = "/{cacheName}/{key}")
-    public Mono<byte[]> get(@PathVariable String cacheName, @PathVariable String key)
-    {
+    public Mono<byte[]> get(@PathVariable String cacheName, @PathVariable String key) {
         byte[] cachedValue = cacheService.get(cacheName, key).orElse(null);
-        if(cachedValue == null)
+        if (cachedValue == null)
             return Mono.empty();
         return Mono.just(cachedValue);
     }
@@ -42,42 +43,36 @@ public class CacheEndpoint
      */
     @PostMapping(value = "/{cacheName}/{key}")
     public Mono<byte[]> put(@PathVariable String cacheName, @PathVariable String key,
-                            @RequestBody Mono<byte[]> valuePublisher)
-    {
+                            @RequestBody Mono<byte[]> valuePublisher) {
         return Mono.create(emitter -> valuePublisher.subscribe(value ->
                 cacheService.put(cacheName, key, value).ifPresent(emitter::success)));
     }
 
     @DeleteMapping(value = "/{cacheName}/{key}")
-    public Mono<byte[]> remove(@PathVariable String cacheName, @PathVariable String key)
-    {
+    public Mono<byte[]> remove(@PathVariable String cacheName, @PathVariable String key) {
         byte[] cachedValue = cacheService.remove(cacheName, key).orElse(null);
-        if(cachedValue == null)
+        if (cachedValue == null)
             return Mono.empty();
         return Mono.just(cachedValue);
     }
 
     @GetMapping(value = "/props")
-    public Mono<CacheManagerProperties> getProperties()
-    {
+    public Mono<CacheManagerProperties> getProperties() {
         return Mono.just(cacheService.getManagerProperties());
     }
 
     @GetMapping(value = "/props/{cacheName}")
-    public Mono<CacheProperties> getCacheProperties(@PathVariable String cacheName)
-    {
+    public Mono<CacheProperties> getCacheProperties(@PathVariable String cacheName) {
         return Mono.just(cacheService.getCacheProperties(cacheName));
     }
 
     @GetMapping(value = "/isClosed")
-    public Mono<Boolean> isClosed()
-    {
+    public Mono<Boolean> isClosed() {
         return Mono.just(cacheService.isClosed());
     }
 
     @GetMapping(value = "/isClosed/{cacheName}")
-    public Mono<Boolean> isClosed(@PathVariable String cacheName)
-    {
+    public Mono<Boolean> isClosed(@PathVariable String cacheName) {
         return Mono.just(cacheService.isClosed(cacheName));
     }
 }

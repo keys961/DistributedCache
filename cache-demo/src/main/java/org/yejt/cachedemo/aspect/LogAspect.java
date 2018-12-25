@@ -8,18 +8,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author keys961
+ */
 @Aspect
 @Component
-public class LogAspect
-{
+public class LogAspect {
     private static final Logger LOGGER = LoggerFactory.getLogger(LogAspect.class);
 
     @Pointcut("@annotation(org.yejt.cachedemo.annotation.Log)")
-    public void logPointCut() { }
+    public void logPointCut() {
+    }
 
     @Around("logPointCut()")
-    public Object log(ProceedingJoinPoint joinPoint) throws Throwable
-    {
+    public Object log(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
         Object result = joinPoint.proceed();
         long currentTime = System.currentTimeMillis();

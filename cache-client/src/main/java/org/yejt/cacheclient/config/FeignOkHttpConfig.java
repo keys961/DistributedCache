@@ -11,11 +11,13 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author keys961
+ */
 @Configuration
 @ConditionalOnClass(Feign.class)
 @AutoConfigureBefore(FeignAutoConfiguration.class)
-public class FeignOkHttpConfig
-{
+public class FeignOkHttpConfig {
     @Value("${xxcache.client.readTimeout:2000}")
     private int readTimeout;
 
@@ -32,8 +34,7 @@ public class FeignOkHttpConfig
     private int keepAliveDuration;
 
     @Bean
-    public okhttp3.OkHttpClient okHttpClient()
-    {
+    public okhttp3.OkHttpClient okHttpClient() {
         return new okhttp3.OkHttpClient.Builder()
                 .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
                 .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)

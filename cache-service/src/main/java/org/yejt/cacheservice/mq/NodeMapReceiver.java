@@ -13,14 +13,15 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeMap;
 
+/**
+ * @author keys961
+ */
 @Component
-public class NodeMapReceiver
-{
+public class NodeMapReceiver {
     private static final Logger LOGGER = LoggerFactory.getLogger(NodeMapReceiver.class);
 
     @RabbitListener(queues = "#{mqConfig.NODE_MAP_QUEUE_NAME}")
-    public void receiveNodeMap(@Payload TreeMap<Integer, InstanceInfo> nodeMap, @Header long version)
-    {
+    public void receiveNodeMap(@Payload TreeMap<Integer, InstanceInfo> nodeMap, @Header long version) {
         LOGGER.info("Receive node map with version {}: {}", version,
                 nodeMap);
         Set<InstanceInfo> serverSet = new HashSet<>();

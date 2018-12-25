@@ -9,16 +9,21 @@ import org.yejt.cacheroute.utils.ServiceMapUtils;
 
 import java.util.TreeMap;
 
+/**
+ * @author keys961
+ */
 @Component
-public class NodeMapSender
-{
+public class NodeMapSender {
     private static final String VERSION = "version";
 
-    @Autowired
-    private RabbitTemplate template;
+    private final RabbitTemplate template;
 
-    public void sendNodeMap()
-    {
+    @Autowired
+    public NodeMapSender(RabbitTemplate template) {
+        this.template = template;
+    }
+
+    public void sendNodeMap() {
         TreeMap<Integer, InstanceInfo> nodeMap = ServiceMapUtils.getServerTreeMap();
         long version = ServiceMapUtils.getVersion();
 

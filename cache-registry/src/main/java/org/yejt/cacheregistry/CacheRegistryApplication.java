@@ -7,15 +7,15 @@ import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 /**
  * This application is used as a registry server
  * which manages the cluster cache server.
- * Cache servers provide the cache service
+ * Cache servers provide the cache service.
+ *
+ * @author yejt
  */
 @SpringBootApplication
 @EnableEurekaServer
-public class CacheRegistryApplication
-{
+public class CacheRegistryApplication {
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         SpringApplication.run(CacheRegistryApplication.class, args);
     }
 }

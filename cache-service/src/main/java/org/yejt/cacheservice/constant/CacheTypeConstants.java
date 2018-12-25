@@ -1,7 +1,9 @@
 package org.yejt.cacheservice.constant;
 
-public class CacheTypeConstants
-{
+/**
+ * @author keys961
+ */
+public class CacheTypeConstants {
     public static final String DEFAULT = "default";
 
     public static final String BASIC = "basic";

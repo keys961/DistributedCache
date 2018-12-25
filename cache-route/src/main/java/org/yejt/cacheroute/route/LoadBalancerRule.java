@@ -2,7 +2,9 @@ package org.yejt.cacheroute.route;
 
 import com.netflix.loadbalancer.IRule;
 
-public interface LoadBalancerRule extends IRule
-{
+/**
+ * @author keys961
+ */
+public interface LoadBalancerRule extends IRule {
 
 }

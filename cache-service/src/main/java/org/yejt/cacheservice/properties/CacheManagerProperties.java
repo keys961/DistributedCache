@@ -8,13 +8,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * @author keys961
+ */
 @Component("cacheManagerProperties")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ConfigurationProperties(prefix = "xxcache")
-public class CacheManagerProperties
-{
+public class CacheManagerProperties {
     private String name;
 
     private List<CacheProperties> caches;

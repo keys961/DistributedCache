@@ -1,7 +1,10 @@
-package org.yejt.cacheservice.cache;
+package org.yejt.cacheservice.cache.manager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yejt.cacheservice.cache.Cache;
+import org.yejt.cacheservice.cache.CacheManager;
+import org.yejt.cacheservice.cache.cache.XXCache;
 import org.yejt.cacheservice.properties.CacheManagerProperties;
 import org.yejt.cacheservice.properties.CacheProperties;
 
@@ -9,8 +12,10 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class XXCacheManager implements CacheManager<String, byte[]>
-{
+/**
+ * @author keys961
+ */
+public class XXCacheManager implements CacheManager<String, byte[]> {
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheManager.class);
 
     private Map<String, Cache<String, byte[]>> cacheMap;
@@ -19,8 +24,7 @@ public class XXCacheManager implements CacheManager<String, byte[]>
 
     private volatile boolean isClosed;
 
-    public XXCacheManager(CacheManagerProperties properties)
-    {
+    public XXCacheManager(CacheManagerProperties properties) {
         this.properties = properties;
         cacheMap = new ConcurrentHashMap<>();
         properties.getCaches()
@@ -28,20 +32,17 @@ public class XXCacheManager implements CacheManager<String, byte[]>
     }
 
     @Override
-    public Cache<String, byte[]> getCache(String cacheName)
-    {
+    public Cache<String, byte[]> getCache(String cacheName) {
         return cacheMap.getOrDefault(cacheName, null);
     }
 
     @Override
-    public Iterable<String> getCacheNames()
-    {
+    public Iterable<String> getCacheNames() {
         return Collections.unmodifiableSet(cacheMap.keySet());
     }
 
     @Override
-    public Cache<String, byte[]> createCache(String cacheName, CacheProperties cacheProperties)
-    {
+    public Cache<String, byte[]> createCache(String cacheName, CacheProperties cacheProperties) {
         Cache<String, byte[]> cache = new XXCache(cacheProperties);
         cacheMap.put(cacheName, cache);
         LOGGER.info("XXCacheManager#createCache: Cache {} is created.", cacheName);
@@ -49,11 +50,9 @@ public class XXCacheManager implements CacheManager<String, byte[]>
     }
 
     @Override
-    public void destroyCache(String cacheName)
-    {
+    public void destroyCache(String cacheName) {
         Cache<String, byte[]> cache = cacheMap.get(cacheName);
-        if(cache != null)
-        {
+        if (cache != null) {
             cache.close();
             LOGGER.info("XXCacheManager#destroyCache: Cache {} is destroyed.", cacheName);
             cacheMap.remove(cacheName);
@@ -61,22 +60,19 @@ public class XXCacheManager implements CacheManager<String, byte[]>
     }
 
     @Override
-    public CacheManagerProperties getProperties()
-    {
+    public CacheManagerProperties getProperties() {
         return properties;
     }
 
     @Override
-    public void close()
-    {
+    public void close() {
         isClosed = true;
         cacheMap.forEach((name, cache) -> cache.close());
         LOGGER.warn("XXCacheManager#close: CacheManager is destroyed.");
     }
 
     @Override
-    public boolean isClosed()
-    {
+    public boolean isClosed() {
         return isClosed;
     }
 }

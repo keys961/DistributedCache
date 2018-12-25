@@ -14,25 +14,29 @@ import org.yejt.cacheroute.utils.ServiceMapUtils;
 
 import java.util.HashSet;
 
+/**
+ * @author keys961
+ */
 @Component
-public class ClusterNodeReceiver
-{
+public class ClusterNodeReceiver {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClusterNodeReceiver.class);
 
     @Value("${loadBalance.virtualNode:16}")
     private int virtualNodes;
 
+    private final NodeMapSender nodeMapSender;
+
     @Autowired
-    private NodeMapSender nodeMapSender;
+    public ClusterNodeReceiver(NodeMapSender nodeMapSender) {
+        this.nodeMapSender = nodeMapSender;
+    }
 
     @RabbitListener(queues = "#{mqConfig.ADD_NODE_QUEUE_NAME}")
-    public void receiveAddNode(@Payload InstanceInfo o, @Header long timestamp)
-    {
+    public void receiveAddNode(@Payload InstanceInfo o, @Header long timestamp) {
         // registry
         HashSet<Integer> hashValSet = new HashSet<>();
         int port = Integer.parseInt(o.getInstanceId().split(":")[2]);
-        for(int i = 0; i < virtualNodes; i++)
-        {
+        for (int i = 0; i < virtualNodes; i++) {
             String tag = "#" + i + "-"
                     + o.getIPAddr() + ":" + port
                     + "::" + o.getAppName();
@@ -46,8 +50,7 @@ public class ClusterNodeReceiver
     }
 
     @RabbitListener(queues = "#{mqConfig.REMOVE_NODE_QUEUE_NAME}")
-    public void receiveRemoveNode(@Payload InstanceInfo o, @Header long timestamp)
-    {
+    public void receiveRemoveNode(@Payload InstanceInfo o, @Header long timestamp) {
         // remove
         ServiceMapUtils.removeServer(o, timestamp);
         LOGGER.info("Server added: {}. Timestamp: {}.", o.getInstanceId(),

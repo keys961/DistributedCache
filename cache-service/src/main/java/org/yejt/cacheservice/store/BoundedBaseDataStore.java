@@ -10,11 +10,12 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Bounded base data store
- * Replacing Strategy: Random Pick
+ * <p>Bounded base data store.
+ * <p>Replacing strategy: random pick.
+ *
+ * @author keys961
  */
-public class BoundedBaseDataStore<K, V> implements DataStore<K, V>
-{
+public class BoundedBaseDataStore<K, V> implements DataStore<K, V> {
     private final long capacity;
 
     private long count = 0L;
@@ -23,23 +24,18 @@ public class BoundedBaseDataStore<K, V> implements DataStore<K, V>
 
     private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public BoundedBaseDataStore(long capacity)
-    {
+    public BoundedBaseDataStore(long capacity) {
         this.capacity = capacity;
         this.cache = new HashMap<>(Long.valueOf(capacity).intValue());
     }
 
     @Override
-    public Set<Map.Entry<K, ValueHolder<V>>> getAll()
-    {
+    public Set<Map.Entry<K, ValueHolder<V>>> getAll() {
         Set<Map.Entry<K, ValueHolder<V>>> entries;
-        try
-        {
+        try {
             lock.readLock().lock();
             entries = cache.entrySet();
-        }
-        finally
-        {
+        } finally {
             lock.readLock().unlock();
         }
 
@@ -47,16 +43,12 @@ public class BoundedBaseDataStore<K, V> implements DataStore<K, V>
     }
 
     @Override
-    public ValueHolder<V> get(K key)
-    {
+    public ValueHolder<V> get(K key) {
         ValueHolder<V> v;
-        try
-        {
+        try {
             lock.readLock().lock();
             v = cache.get(key);
-        }
-        finally
-        {
+        } finally {
             lock.readLock().unlock();
         }
 
@@ -64,40 +56,35 @@ public class BoundedBaseDataStore<K, V> implements DataStore<K, V>
     }
 
     @Override
-    public ValueHolder<V> put(K key, V value)
-    {
+    public ValueHolder<V> put(K key, V value) {
         ValueHolder<V> oldValue, newValue;
-        try
-        {
+        try {
             lock.writeLock().lock();
-            if (count >= capacity)
+            if (count >= capacity) {
                 removeRandomly();
+            }
             newValue = new BaseValueHolder<>(value);
             oldValue = cache.get(key);
             cache.put(key, newValue);
-            if (oldValue == null)
+            if (oldValue == null) {
                 count++;
-        }
-        finally
-        {
+            }
+        } finally {
             lock.writeLock().unlock();
         }
         return newValue;
     }
 
     @Override
-    public ValueHolder<V> remove(K key)
-    {
+    public ValueHolder<V> remove(K key) {
         ValueHolder<V> holder = null;
-        try
-        {
+        try {
             lock.writeLock().lock();
             holder = cache.remove(key);
-            if (holder != null)
+            if (holder != null) {
                 count--;
-        }
-        finally
-        {
+            }
+        } finally {
             lock.writeLock().unlock();
         }
 
@@ -105,26 +92,22 @@ public class BoundedBaseDataStore<K, V> implements DataStore<K, V>
     }
 
     @Override
-    public void clear()
-    {
-        try
-        {
+    public void clear() {
+        try {
             lock.writeLock().lock();
             cache.clear();
             count = 0L;
-        }
-        finally
-        {
+        } finally {
             lock.writeLock().unlock();
         }
 
     }
 
-    private void removeRandomly()
-    {
+    private void removeRandomly() {
         // double check
-        if(count < capacity)
+        if (count < capacity) {
             return;
+        }
 
         Optional<K> optionalKey = cache.keySet().stream().parallel().findAny();
         optionalKey.ifPresent(key -> cache.remove(key));

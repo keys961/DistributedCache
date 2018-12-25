@@ -7,20 +7,20 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.web.reactive.config.EnableWebFlux;
 
 /**
- * This application provides the real caching functions.
+ * <p>This application provides the real caching functions.
  * It will be deployed to a server and registered to the
- * registry server.
- * 1. client -> registry server (with load balance on client): get caching server
- * 2. client -> caching server: operate on cache
+ * registry server.</p>
+ * <p>1. client -> registry server (with load balance on client): get caching server
+ * <p>2. client -> caching server: operate on cache
+ *
+ * @author keys961
  */
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableEurekaClient
 @EnableWebFlux
-public class CacheServiceApplication
-{
-    public static void main(String[] args)
-    {
+public class CacheServiceApplication {
+    public static void main(String[] args) {
         SpringApplication.run(CacheServiceApplication.class, args);
     }
 }

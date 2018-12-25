@@ -4,11 +4,12 @@ import com.netflix.appinfo.InstanceInfo;
 
 import java.util.Map;
 
-public class MigrateUtils
-{
-    public static Map<InstanceInfo, Map<?, ?>> getMigrationData(Map<Integer, InstanceInfo> originalMap)
-    {
-
+/**
+ * @author keys961
+ */
+public class MigrateUtils {
+    public static Map<InstanceInfo, Map<?, ?>> getMigrationData(Map<Integer, InstanceInfo> originalMap) {
+        //TODO: Migration map changes
         return null;
     }
 }

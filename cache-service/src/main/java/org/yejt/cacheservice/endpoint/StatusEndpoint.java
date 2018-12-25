@@ -9,19 +9,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+/**
+ * Heartbeat REST API
+ *
+ * @author keys961
+ */
 @RestController
-public class StatusEndpoint
-{
+public class StatusEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(StatusEndpoint.class);
 
     @GetMapping(value = "/health")
-    public Mono<Integer> health()
-    {
-        try
-        {
+    public Mono<Integer> health() {
+        try {
             InstanceInfo myInfo = ApplicationInfoManager.getInstance().getInfo();
-            switch(myInfo.getStatus())
-            {
+            switch (myInfo.getStatus()) {
                 case UP:
                     return Mono.just(HttpStatus.OK.value());
                 case STARTING:
@@ -31,10 +32,8 @@ public class StatusEndpoint
                 default:
                     return Mono.just(HttpStatus.INTERNAL_SERVER_ERROR.value());
             }
-        }
-        catch (Throwable var2)
-        {
-            LOGGER.error("Error when doing health check.");
+        } catch (Throwable throwable) {
+            LOGGER.error("Error when doing health check: {}", throwable.getMessage());
             return Mono.just(HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
     }

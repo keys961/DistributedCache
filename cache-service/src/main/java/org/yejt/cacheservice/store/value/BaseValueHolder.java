@@ -1,33 +1,34 @@
 package org.yejt.cacheservice.store.value;
 
-public class BaseValueHolder<V> implements ValueHolder<V>
-{
+/**
+ * Base value holder.
+ *
+ * @param <V>: Value type
+ * @author keys961
+ */
+public class BaseValueHolder<V> implements ValueHolder<V> {
     private final V value;
 
     private final long timestamp;
 
-    public BaseValueHolder(V value)
-    {
+    public BaseValueHolder(V value) {
         this.value = value;
         timestamp = System.currentTimeMillis();
     }
 
     @Override
-    public V value()
-    {
+    public V value() {
         return value;
     }
 
     @Override
-    public long getTimestamp()
-    {
+    public long getTimestamp() {
         return timestamp;
     }
 
     @Override
-    public String toString()
-    {
-        if(value == null)
+    public String toString() {
+        if (value == null)
             return null;
         return value.toString();
     }

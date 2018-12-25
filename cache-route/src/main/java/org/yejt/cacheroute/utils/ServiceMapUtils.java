@@ -4,8 +4,10 @@ import com.netflix.appinfo.InstanceInfo;
 
 import java.util.*;
 
-public class ServiceMapUtils
-{
+/**
+ * @author keys961
+ */
+public class ServiceMapUtils {
     private static TreeMap<Integer, InstanceInfo> serverTreeMap
             = new TreeMap<>();
 
@@ -13,50 +15,50 @@ public class ServiceMapUtils
 
     private static Set<InstanceInfo> serverSet = new HashSet<>();
 
-    // TODO: Need to persist that...
+    /**
+     * TODO: Need to persist that...
+     **/
     private static long version = -1L;
 
-    public static TreeMap<Integer, InstanceInfo> getServerTreeMap()
-    {
+    public static TreeMap<Integer, InstanceInfo> getServerTreeMap() {
         return serverTreeMap;
     }
 
-    public static void setServerTreeMap(TreeMap<Integer, InstanceInfo> serverTreeMap)
-    {
+    public static void setServerTreeMap(TreeMap<Integer, InstanceInfo> serverTreeMap) {
         ServiceMapUtils.serverTreeMap = serverTreeMap;
     }
 
     public static synchronized void addServer(Collection<Integer> hashVals,
-                                              InstanceInfo server, Long timestamp)
-    {
-        if(!serverTimestamp.containsKey(server) || serverTimestamp.get(server) < timestamp)
-        {
-            hashVals.forEach(i -> serverTreeMap.put(i, server)); // put hash val
-            serverTimestamp.put(server, timestamp); // set timestamp/id
-            serverSet.add(server); // add server
+                                              InstanceInfo server, Long timestamp) {
+        if (!serverTimestamp.containsKey(server) || serverTimestamp.get(server) < timestamp) {
+            // put hash val
+            hashVals.forEach(i -> serverTreeMap.put(i, server));
+            // set timestamp/id
+            serverTimestamp.put(server, timestamp);
+            // add server
+            serverSet.add(server);
             version++;
         }
     }
 
-    public static synchronized void removeServer(InstanceInfo server, Long timestamp)
-    {
-        if(!serverTimestamp.containsKey(server) || timestamp > serverTimestamp.get(server))
-        {
-            serverTreeMap.entrySet().removeIf(entry -> entry.getValue().equals(server)); //remove map
-            serverTimestamp.put(server, timestamp); // update timestamp
-            serverSet.remove(server); // remove server set
+    public static synchronized void removeServer(InstanceInfo server, Long timestamp) {
+        if (!serverTimestamp.containsKey(server) || timestamp > serverTimestamp.get(server)) {
+            //remove map
+            serverTreeMap.entrySet().removeIf(entry -> entry.getValue().equals(server));
+            // update timestamp
+            serverTimestamp.put(server, timestamp);
+            // remove server set
+            serverSet.remove(server);
             version++;
         }
     }
 
     @Deprecated
-    public static synchronized void removeServer(Map<InstanceInfo, Long> serverSet)
-    {
+    public static synchronized void removeServer(Map<InstanceInfo, Long> serverSet) {
         serverSet.forEach(ServiceMapUtils::removeServer);
     }
 
-    public static synchronized void removeServerForcely(Set<InstanceInfo> set)
-    {
+    public static synchronized void removeServerForcely(Set<InstanceInfo> set) {
         set.forEach(server ->
         {
             serverTreeMap.keySet().
@@ -67,13 +69,11 @@ public class ServiceMapUtils
         });
     }
 
-    public static Set<InstanceInfo> getServerSet()
-    {
+    public static Set<InstanceInfo> getServerSet() {
         return serverSet;
     }
 
-    public static long getVersion()
-    {
+    public static long getVersion() {
         return version;
     }
 }

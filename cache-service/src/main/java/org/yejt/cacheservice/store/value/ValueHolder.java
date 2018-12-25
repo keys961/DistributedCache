@@ -1,10 +1,11 @@
 package org.yejt.cacheservice.store.value;
 
-public interface ValueHolder<V>
-{
+public interface ValueHolder<V> {
     V value();
 
     long getTimestamp();
 
-    default int getSize() { return 1; }
+    default int getSize() {
+        return 1;
+    }
 }

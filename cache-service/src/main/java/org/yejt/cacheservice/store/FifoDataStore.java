@@ -10,10 +10,12 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Replacing strategy: FIFO
+ * <p>Bounded storage using FIFO replacement.
+ * <p>Replacing strategy: FIFO.
+ *
+ * @author keys961
  */
-public class FifoDataStore<K, V> implements DataStore<K, V>
-{
+public class FifoDataStore<K, V> implements DataStore<K, V> {
     private final long capacity;
 
     private long count = 0L;
@@ -22,51 +24,40 @@ public class FifoDataStore<K, V> implements DataStore<K, V>
 
     private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public FifoDataStore(long capacity)
-    {
+    public FifoDataStore(long capacity) {
         this.capacity = capacity;
         cache = new LinkedHashMap<>();
     }
 
     @Override
-    public ValueHolder<V> get(K key)
-    {
+    public ValueHolder<V> get(K key) {
         ValueHolder<V> v = null;
-        try
-        {
+        try {
             lock.readLock().lock();
             v = cache.get(key);
             lock.readLock().unlock();
-        }
-        finally
-        {
+        } finally {
             lock.readLock().unlock();
         }
         return v;
     }
 
     @Override
-    public Set<Map.Entry<K, ValueHolder<V>>> getAll()
-    {
+    public Set<Map.Entry<K, ValueHolder<V>>> getAll() {
         Set<Map.Entry<K, ValueHolder<V>>> entries = new HashSet<>();
-        try
-        {
+        try {
             lock.readLock().lock();
             entries = cache.entrySet();
-        }
-        finally
-        {
+        } finally {
             lock.readLock().unlock();
         }
         return entries;
     }
 
     @Override
-    public ValueHolder<V> put(K key, V value)
-    {
+    public ValueHolder<V> put(K key, V value) {
         ValueHolder<V> oldValue, newValue = new BaseValueHolder<>(value);
-        try
-        {
+        try {
             lock.writeLock().lock();
             if (count >= capacity)
                 removeEntry();
@@ -74,29 +65,23 @@ public class FifoDataStore<K, V> implements DataStore<K, V>
             cache.put(key, newValue);
             if (oldValue == null)
                 count++;
-        }
-        finally
-        {
+        } finally {
             lock.writeLock().unlock();
         }
         return newValue;
     }
 
     @Override
-    public ValueHolder<V> remove(K key)
-    {
+    public ValueHolder<V> remove(K key) {
         ValueHolder<V> holder = null;
-        try
-        {
+        try {
             lock.writeLock().lock();
 
             holder = cache.remove(key);
 
             if (holder != null)
                 count--;
-        }
-        finally
-        {
+        } finally {
             lock.writeLock().unlock();
         }
 
@@ -104,32 +89,26 @@ public class FifoDataStore<K, V> implements DataStore<K, V>
     }
 
     @Override
-    public void clear()
-    {
-        try
-        {
+    public void clear() {
+        try {
             lock.writeLock().lock();
             cache.clear();
             count = 0L;
-        }
-        finally
-        {
+        } finally {
             lock.writeLock().unlock();
         }
     }
 
-    private void removeEntry()
-    {
+    private void removeEntry() {
         // double check
-        if(count < capacity || cache.isEmpty())
+        if (count < capacity || cache.isEmpty())
             return;
 
         K key = findFirstEntry();
         cache.remove(key);
     }
 
-    private K findFirstEntry()
-    {
+    private K findFirstEntry() {
         return cache.keySet().iterator().next();
     }
 }

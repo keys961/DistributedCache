@@ -14,56 +14,55 @@ import org.yejt.cacheservice.utils.TimestampUtils;
 
 import java.io.IOException;
 
+/**
+ * @author keys961
+ */
 @Component
-public class ClusterNodeSender implements ApplicationRunner, DisposableBean
-{
+public class ClusterNodeSender implements ApplicationRunner, DisposableBean {
     private static final String TIMESTAMP = "timestamp";
 
-    @Autowired
-    private AmqpTemplate template;
+    private final AmqpTemplate template;
 
     private InstanceInfo instanceInfo;
 
-    public void sendAddNodeMessage()
-    {
+    @Autowired
+    public ClusterNodeSender(AmqpTemplate template) {
+        this.template = template;
+    }
+
+    public void sendAddNodeMessage() {
         // send registry message to proxy
         instanceInfo =
                 ApplicationInfoManager.getInstance().getInfo();
         template.convertAndSend(MqConfig.CACHE_NODE_EXCHANGE,
                 MqConfig.ADD_NODE_TOPIC, instanceInfo,
-                    this::sendMessage);
+                this::sendMessage);
     }
 
-    public void sendRemoveNodeMessage()
-    {
+    public void sendRemoveNodeMessage() {
         // send remove message to proxy
         template.convertAndSend(MqConfig.CACHE_NODE_EXCHANGE,
                 MqConfig.REMOVE_NODE_TOPIC, instanceInfo,
-                    this::sendMessage);
+                this::sendMessage);
     }
 
     private Message sendMessage(Message message) {
-        try
-        {
+        try {
             message.getMessageProperties().setHeader(TIMESTAMP,
                     TimestampUtils.getTimestamp());
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             message.getMessageProperties().setHeader(TIMESTAMP, 0);
         }
         return message;
     }
 
     @Override
-    public void run(ApplicationArguments args)
-    {
+    public void run(ApplicationArguments args) {
         sendAddNodeMessage();
     }
 
     @Override
-    public void destroy() throws Exception
-    {
+    public void destroy() throws Exception {
         sendRemoveNodeMessage();
     }
 }

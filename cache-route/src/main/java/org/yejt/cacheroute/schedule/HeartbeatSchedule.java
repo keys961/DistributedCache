@@ -15,47 +15,46 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author keys961
+ */
 @Component
 @EnableScheduling
-public class HeartbeatSchedule
-{
+public class HeartbeatSchedule {
     private static final Logger LOGGER = LoggerFactory.getLogger(HeartbeatSchedule.class);
+    private static final String PATH = "/health";
+    private final WebClient heartBeatClient;
 
     @Autowired
-    private WebClient heartBeatClient;
-
-    private static final String PATH = "/health";
+    public HeartbeatSchedule(WebClient heartBeatClient) {
+        this.heartBeatClient = heartBeatClient;
+    }
 
     @Scheduled(initialDelay = 60000L, fixedDelayString = "${loadBalance.interval:60000}")
-    public void heartBeatSchedule()
-    {
+    public void heartBeatSchedule() {
         Set<InstanceInfo> instanceInfoSet = ServiceMapUtils.getServerSet();
         Set<InstanceInfo> removedSet = new HashSet<>();
         instanceInfoSet.forEach(info ->
-            {
-                String ip = info.getIPAddr();
-                int port = Integer.parseInt(info.getInstanceId().split(":")[2]);
-                URI uri = URI.create("http://" + ip + ":" + port + PATH);
-                try
-                {
-                    Integer status = heartBeatClient.get().uri(uri)
-                            .retrieve()
-                            .bodyToFlux(Integer.class)
-                            .blockLast();
-                    if(status != null && (status == HttpStatus.OK.value() || status == HttpStatus.NO_CONTENT.value()))
-                        LOGGER.info("Server {} is still alive.", info.getInstanceId());
-                    else
-                    {
-                        removedSet.add(info);
-                        LOGGER.warn("Server {} is not alive.", info.getInstanceId());
-                    }
-                }
-                catch (Exception e)
-                {
+        {
+            String ip = info.getIPAddr();
+            int port = Integer.parseInt(info.getInstanceId().split(":")[2]);
+            URI uri = URI.create("http://" + ip + ":" + port + PATH);
+            try {
+                Integer status = heartBeatClient.get().uri(uri)
+                        .retrieve()
+                        .bodyToFlux(Integer.class)
+                        .blockLast();
+                if (status != null && (status == HttpStatus.OK.value() || status == HttpStatus.NO_CONTENT.value()))
+                    LOGGER.info("Server {} is still alive.", info.getInstanceId());
+                else {
                     removedSet.add(info);
                     LOGGER.warn("Server {} is not alive.", info.getInstanceId());
                 }
-            });
+            } catch (Exception e) {
+                removedSet.add(info);
+                LOGGER.warn("Server {} is not alive.", info.getInstanceId());
+            }
+        });
         ServiceMapUtils.removeServerForcely(removedSet);
     }
 }

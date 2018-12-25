@@ -7,12 +7,14 @@ import org.yejt.cacheclient.keygen.KeyGenerator;
 
 import java.lang.annotation.*;
 
+/**
+ * @author keys961
+ */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-public @interface CacheRemove
-{
+public @interface CacheRemove {
     String cacheName();
 
     Class<? extends KeyGenerator> keyGenerator() default DefaultKeyGenerator.class;
