@@ -5,13 +5,12 @@ import org.yejt.cacheservice.properties.CacheProperties;
 
 import java.io.Closeable;
 
-public interface CacheManager extends Closeable
-{
-    <K, V> Cache<K, V> getCache(String cacheName);
+public interface CacheManager<K, V> extends Closeable {
+    Cache<K, V> getCache(String cacheName);
 
     Iterable<String> getCacheNames();
 
-    <K, V> Cache<K, V> createCache(String cacheName, CacheProperties cacheProperties);
+    Cache<K, V> createCache(String cacheName, CacheProperties cacheProperties);
 
     void destroyCache(String cacheName);
 

@@ -10,25 +10,25 @@ import org.yejt.cacheclient.client.fallback.XXCacheClientFallback;
 public interface XXCacheClient
 {
     @GetMapping(value = "/{cacheName}/{key}")
-    Object get(@PathVariable("cacheName") String cacheName,
-                       @RequestHeader(FilterConstants.LOAD_BALANCER_KEY)
+    byte[] get(@PathVariable("cacheName") String cacheName,
+               @RequestHeader(FilterConstants.LOAD_BALANCER_KEY)
                        @PathVariable("key") String key);
 
     /**
      * This method will cause cache overwritten
      */
     @PostMapping(value = "/{cacheName}/{key}")
-    Object put(@PathVariable("cacheName") String cacheName,
-             @RequestHeader(FilterConstants.LOAD_BALANCER_KEY)
+    byte[] put(@PathVariable("cacheName") String cacheName,
+               @RequestHeader(FilterConstants.LOAD_BALANCER_KEY)
              @PathVariable("key") String key,
-             @RequestBody Object value);
+               @RequestBody byte[] value);
 
     @DeleteMapping(value = "/{cacheName}/{key}")
-    Object remove(@PathVariable("cacheName") String cacheName,
-                @RequestHeader(FilterConstants.LOAD_BALANCER_KEY)
+    byte[] remove(@PathVariable("cacheName") String cacheName,
+                  @RequestHeader(FilterConstants.LOAD_BALANCER_KEY)
                 @PathVariable("key") String key);
 
     @GetMapping("/hello")
-    String sayHello(@RequestHeader(FilterConstants.LOAD_BALANCER_KEY)
+    byte[] sayHello(@RequestHeader(FilterConstants.LOAD_BALANCER_KEY)
                     @RequestParam(value = "name") String name);
 }

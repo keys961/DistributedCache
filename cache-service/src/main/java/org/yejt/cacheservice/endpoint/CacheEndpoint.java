@@ -9,16 +9,15 @@ import org.yejt.cacheservice.service.CacheService;
 import reactor.core.publisher.Mono;
 
 @RestController
-@SuppressWarnings("unchecked")
 public class CacheEndpoint
 {
     @Value("${server.port}")
     private int port;
 
-    private CacheService cacheService;
+    private CacheService<String, byte[]> cacheService;
 
     @Autowired
-    public CacheEndpoint(CacheService cacheService)
+    public CacheEndpoint(CacheService<String, byte[]> cacheService)
     {
         this.cacheService = cacheService;
     }
@@ -30,9 +29,9 @@ public class CacheEndpoint
     }
 
     @GetMapping(value = "/{cacheName}/{key}")
-    public Mono get(@PathVariable String cacheName, @PathVariable String key)
+    public Mono<byte[]> get(@PathVariable String cacheName, @PathVariable String key)
     {
-        Object cachedValue = cacheService.get(cacheName, key).orElse(null);
+        byte[] cachedValue = cacheService.get(cacheName, key).orElse(null);
         if(cachedValue == null)
             return Mono.empty();
         return Mono.just(cachedValue);
@@ -42,17 +41,17 @@ public class CacheEndpoint
      * This method will cause cache overwritten
      */
     @PostMapping(value = "/{cacheName}/{key}")
-    public Mono put(@PathVariable String cacheName, @PathVariable String key,
-             @RequestBody Mono valuePublisher)
+    public Mono<byte[]> put(@PathVariable String cacheName, @PathVariable String key,
+                            @RequestBody Mono<byte[]> valuePublisher)
     {
         return Mono.create(emitter -> valuePublisher.subscribe(value ->
                 cacheService.put(cacheName, key, value).ifPresent(emitter::success)));
     }
 
     @DeleteMapping(value = "/{cacheName}/{key}")
-    public Mono remove(@PathVariable String cacheName, @PathVariable String key)
+    public Mono<byte[]> remove(@PathVariable String cacheName, @PathVariable String key)
     {
-        Object cachedValue = cacheService.remove(cacheName, key).orElse(null);
+        byte[] cachedValue = cacheService.remove(cacheName, key).orElse(null);
         if(cachedValue == null)
             return Mono.empty();
         return Mono.just(cachedValue);

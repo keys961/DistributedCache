@@ -7,18 +7,16 @@ import org.yejt.cacheservice.properties.CacheProperties;
 
 import java.util.Optional;
 
-public interface CacheService
-{
-    Cache getCache(String cacheName);
+public interface CacheService<K, V> {
+    Cache<K, V> getCache(String cacheName);
 
-    CacheManager getCacheManager();
+    CacheManager<K, V> getCacheManager();
 
-    //TODO: deal with value as raw...
-    Optional put(String cacheName, String key, Object value);
+    Optional<V> put(String cacheName, K key, V value);
 
-    Optional get(String cacheName, String key);
+    Optional<V> get(String cacheName, K key);
 
-    Optional remove(String cacheName, String key);
+    Optional<V> remove(String cacheName, K key);
 
     CacheManagerProperties getManagerProperties();
 

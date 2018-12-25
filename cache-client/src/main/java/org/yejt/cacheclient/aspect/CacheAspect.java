@@ -1,11 +1,12 @@
 package org.yejt.cacheclient.aspect;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.yejt.cacheclient.annotation.CachePut;
@@ -20,17 +21,16 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-//TODO: add codec
 @Aspect
 @Component
 public class CacheAspect
 {
-    @Autowired
-    private XXCacheClient cacheClient;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CacheAspect.class);
 
     @Autowired
-    private ObjectMapper mapper;
+    private XXCacheClient cacheClient;
 
     private ThreadLocal<Map<Class<? extends KeyGenerator>, KeyGenerator>> keyGeneratorCache
             = ThreadLocal.withInitial(HashMap::new);
@@ -51,20 +51,33 @@ public class CacheAspect
     public void cacheRemove() {}
 
     @Around(value = "cacheable()")
+    @SuppressWarnings("unchecked")
     public Object cacheableAspect(ProceedingJoinPoint joinPoint)
-            throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException
+            throws IllegalAccessException, InstantiationException,
+            NoSuchMethodException, InvocationTargetException
     {
         Cacheable annotation = getAnnotation(joinPoint, Cacheable.class);
         Object[] params = joinPoint.getArgs();
         KeyGenerator keyGenerator = getAndCacheKeyGenerator(annotation.keyGenerator());
         CacheCondition cacheCondition = getAndCacheCondition(annotation.condition());
+        CacheCodec cacheCodec = getAndCacheCodec(annotation.codec());
+        if (Objects.isNull(keyGenerator) || Objects.isNull(cacheCondition) || Objects.isNull(cacheCodec))
+            return null;
         // First fetch cache
-        Object cache = cacheClient.get(annotation.cacheName(),
-                keyGenerator.generateKey(joinPoint.getTarget(), params));
-        if(cache != null)
-            return unwrap(cache, getReturnType(joinPoint));
+        try {
+            byte[] raw = cacheClient.get(annotation.cacheName(),
+                    keyGenerator.generateKey(joinPoint.getTarget(), params));
+            if (raw != null) {
+                Object cache = cacheCodec.decode(raw);
+                return unwrap(cache, getReturnType(joinPoint));
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Exception occurred: {}", e.getMessage());
+        }
 
-        return cachePut(joinPoint, params, keyGenerator, cacheCondition, annotation.cacheName());
+        return cachePut(joinPoint, params, keyGenerator,
+                cacheCondition, cacheCodec,
+                annotation.cacheName());
     }
 
     @Around(value = "cachePut()")
@@ -76,11 +89,13 @@ public class CacheAspect
         Object[] params = joinPoint.getArgs();
         KeyGenerator keyGenerator = getAndCacheKeyGenerator(annotation.keyGenerator());
         CacheCondition cacheCondition = getAndCacheCondition(annotation.condition());
-
-        return cachePut(joinPoint, params, keyGenerator, cacheCondition, annotation.cacheName());
+        CacheCodec cacheCodec = getAndCacheCodec(annotation.codec());
+        if (Objects.isNull(keyGenerator) || Objects.isNull(cacheCondition) || Objects.isNull(cacheCodec))
+            return null;
+        return cachePut(joinPoint, params, keyGenerator,
+                cacheCondition, cacheCodec,
+                annotation.cacheName());
     }
-
-
 
     @Around("cacheRemove()")
     public Object cacheRemoveAspect(ProceedingJoinPoint joinPoint)
@@ -91,9 +106,9 @@ public class CacheAspect
         Object[] params = joinPoint.getArgs();
         KeyGenerator keyGenerator = getAndCacheKeyGenerator(annotation.keyGenerator());
         CacheCondition cacheCondition = getAndCacheCondition(annotation.condition());
-        if(keyGenerator == null || cacheCondition == null)
+        if (Objects.isNull(keyGenerator) || Objects.isNull(cacheCondition))
             return null;
-        Object result = null;
+        Object result;
         try
         {
             result = joinPoint.proceed();
@@ -105,10 +120,8 @@ public class CacheAspect
         }
         catch (Throwable throwable)
         {
-            throwable.printStackTrace();
-            if(result == null)
-                return null;
-            return result;
+            LOGGER.warn("Exception occurred: {}", throwable.getMessage());
+            return null;
         }
     }
 
@@ -146,25 +159,34 @@ public class CacheAspect
         return cacheCondition;
     }
 
+    private CacheCodec getAndCacheCodec(Class<? extends CacheCodec> clazz)
+            throws NoSuchMethodException, IllegalAccessException,
+            InvocationTargetException, InstantiationException {
+        if (codecCache.get().containsKey(clazz))
+            return codecCache.get().get(clazz);
+        CacheCodec codec = clazz.getDeclaredConstructor().newInstance();
+        codecCache.get().put(clazz, codec);
+        return codec;
+    }
+
+    @SuppressWarnings("unchecked")
     private Object cachePut(ProceedingJoinPoint joinPoint,
-                            Object[] params, KeyGenerator keyGenerator, CacheCondition cacheCondition, String s)
-    {
-        Object result = null;
-        try
-        {
+                            Object[] params, KeyGenerator keyGenerator,
+                            CacheCondition cacheCondition, CacheCodec codec,
+                            String cacheName) {
+        Object result;
+        try {
             result = joinPoint.proceed();
             String key = keyGenerator.generateKey(joinPoint.getTarget(), params);
             if(result != null && key != null
-                    && cacheCondition.condition(result, params))
-                cacheClient.put(s, key, result);
+                    && cacheCondition.condition(result, params)) {
+                byte[] raw = codec.encode(result);
+                cacheClient.put(cacheName, key, raw);
+            }
             return result;
-        }
-        catch (Throwable throwable)
-        {
-            throwable.printStackTrace();
-            if(result == null)
-                return null;
-            return result;
+        } catch (Throwable throwable) {
+            LOGGER.warn("Exception occurred: {}", throwable.getMessage());
+            return null;
         }
     }
 
@@ -180,9 +202,9 @@ public class CacheAspect
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
         return signature.getReturnType();
     }
-    // TODO: Optimize the serialization/deserialization configuration
+
     private  <T> T unwrap(Object value, Class<T> cls)
     {
-        return mapper.convertValue(value, cls);
+        return cls.cast(value);
     }
 }

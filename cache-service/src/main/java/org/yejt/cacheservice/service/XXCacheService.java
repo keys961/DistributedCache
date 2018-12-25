@@ -10,44 +10,52 @@ import org.yejt.cacheservice.properties.CacheProperties;
 import java.util.Optional;
 
 @Service
-public class XXCacheService implements CacheService
-{
-    private CacheManager cacheManager;
+public class XXCacheService implements CacheService<String, byte[]> {
+    private CacheManager<String, byte[]> cacheManager;
 
     @Autowired
-    public XXCacheService(CacheManager cacheManager)
+    public XXCacheService(CacheManager<String, byte[]> cacheManager)
     {
         this.cacheManager = cacheManager;
     }
 
     @Override
-    public Cache getCache(String cacheName)
+    public Cache<String, byte[]> getCache(String cacheName)
     {
         return cacheManager.getCache(cacheName);
     }
 
     @Override
-    public CacheManager getCacheManager()
+    public CacheManager<String, byte[]> getCacheManager()
     {
         return cacheManager;
     }
 
     @Override
-    public Optional put(String cacheName, String key, Object value)
+    public Optional<byte[]> put(String cacheName, String key, byte[] value)
     {
+        Cache<String, byte[]> cache = getCache(cacheName);
+        if (cache == null)
+            return Optional.empty();
         return Optional.ofNullable(cacheManager.getCache(cacheName).
                 put(key, value));
     }
 
     @Override
-    public Optional get(String cacheName, String key)
+    public Optional<byte[]> get(String cacheName, String key)
     {
+        Cache<String, byte[]> cache = getCache(cacheName);
+        if (cache == null)
+            return Optional.empty();
         return Optional.ofNullable(cacheManager.getCache(cacheName).get(key));
     }
 
     @Override
-    public Optional remove(String cacheName, String key)
+    public Optional<byte[]> remove(String cacheName, String key)
     {
+        Cache<String, byte[]> cache = getCache(cacheName);
+        if (cache == null)
+            return Optional.empty();
         return Optional.ofNullable(cacheManager.getCache(cacheName).remove(key));
     }
 

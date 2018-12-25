@@ -19,7 +19,7 @@ hystrix:
       execution:
         isolation:
           thread:
-            timeoutInMilliseconds: 2000
+            timeoutInMilliseconds: 4000
 
 zuul:
   routes:
@@ -36,5 +36,5 @@ ribbon:
     enabled: false
   okhttp:
     enabled: true
-  readTimeout: 2000
-  connectTimeout: 2000
+  readTimeout: 4000
+  connectTimeout: 4000

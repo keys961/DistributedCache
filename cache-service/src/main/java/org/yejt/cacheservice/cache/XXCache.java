@@ -14,15 +14,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class XXCache<K, V> implements Cache<K, V>
+public class XXCache implements Cache<String, byte[]>
 {
     private final Logger LOGGER = LoggerFactory.getLogger(XXCache.class);
 
-    private DataStore<K, V> dataStore;
+    private DataStore<String, byte[]> dataStore;
 
     private CacheProperties properties;
 
-    private CacheExpirationManager<K, V> cacheExpirationManager;
+    private CacheExpirationManager<String, byte[]> cacheExpirationManager;
 
     private volatile boolean isClosed;
 
@@ -102,12 +102,12 @@ public class XXCache<K, V> implements Cache<K, V>
 
 
     @Override
-    public V get(K key)
+    public byte[] get(String key)
     {
         if(isClosed)
             throw new RuntimeException("Cache is closed.");
 
-        V v = cacheExpirationManager.filter(key, dataStore.get(key));
+        byte[] v = cacheExpirationManager.filter(key, dataStore.get(key));
         LOGGER.info("XXCache - {}#get: key: {}, value: {}.", properties.getCacheName(),
                 key, v);
 
@@ -115,11 +115,11 @@ public class XXCache<K, V> implements Cache<K, V>
     }
 
     @Override
-    public Map<K, V> getAll(Set<? extends K> keys)
+    public Map<String, byte[]> getAll(Set<? extends String> keys)
     {
         if(isClosed)
             throw new RuntimeException("Cache is closed.");
-        Map<K, V> kvMap = new HashMap<>();
+        Map<String, byte[]> kvMap = new HashMap<>();
         keys.forEach(k -> kvMap.put(k, get(k)));
         LOGGER.info("XXCache - {}#getAll: keys: {}, values: {}.", properties.getCacheName(),
                 keys, kvMap);
@@ -127,17 +127,17 @@ public class XXCache<K, V> implements Cache<K, V>
     }
 
     @Override
-    public DataStore<K, V> getDataStore()
+    public DataStore<String, byte[]> getDataStore()
     {
         return this.dataStore;
     }
 
     @Override
-    public V put(K key, V value)
+    public byte[] put(String key, byte[] value)
     {
         if(isClosed)
             throw new RuntimeException("Cache is closed.");
-        ValueHolder<V> v = dataStore.put(key, value);
+        ValueHolder<byte[]> v = dataStore.put(key, value);
         LOGGER.info("XXCache - {}#put: key: {}, value: {}.", properties.getCacheName(),
                 key, v);
         if(v == null)
@@ -147,11 +147,11 @@ public class XXCache<K, V> implements Cache<K, V>
     }
 
     @Override
-    public V remove(K key)
+    public byte[] remove(String key)
     {
         if(isClosed)
             throw new RuntimeException("Cache is closed.");
-        ValueHolder<V> v = dataStore.remove(key);
+        ValueHolder<byte[]> v = dataStore.remove(key);
         LOGGER.info("XXCache - {}#remove: key: {}, value: {}.", properties.getCacheName(),
                 key, v);
         if(v == null)
@@ -161,7 +161,7 @@ public class XXCache<K, V> implements Cache<K, V>
     }
 
     @Override
-    public boolean containsKey(K key)
+    public boolean containsKey(String key)
     {
         if(isClosed)
             throw new RuntimeException("Cache is closed.");

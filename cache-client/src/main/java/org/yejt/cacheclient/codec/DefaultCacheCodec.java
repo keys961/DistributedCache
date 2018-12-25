@@ -22,12 +22,13 @@ public class DefaultCacheCodec implements CacheCodec<Object> {
             kryo = pool.borrow();
             Output output = new Output(byteArrayOutputStream);
             kryo.writeClassAndObject(output, value);
-            rawValue = output.getBuffer();
+            rawValue = output.toBytes();
             output.close();
         }
         catch (Exception e)
         {
             //no-op
+            e.printStackTrace();
         }
         finally
         {
@@ -52,6 +53,7 @@ public class DefaultCacheCodec implements CacheCodec<Object> {
         catch (Exception e)
         {
             // no-op
+            e.printStackTrace();
         }
         finally
         {

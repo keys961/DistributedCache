@@ -9,11 +9,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class XXCacheManager implements CacheManager
+public class XXCacheManager implements CacheManager<String, byte[]>
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheManager.class);
 
-    private Map<String, Cache<?, ?>> cacheMap;
+    private Map<String, Cache<String, byte[]>> cacheMap;
 
     private CacheManagerProperties properties;
 
@@ -23,15 +23,14 @@ public class XXCacheManager implements CacheManager
     {
         this.properties = properties;
         cacheMap = new ConcurrentHashMap<>();
-        properties.getCaches().forEach(p -> cacheMap.put(p.getCacheName(),
-                new XXCache<>(p)));
+        properties.getCaches()
+                .forEach(p -> cacheMap.put(p.getCacheName(), new XXCache(p)));
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <K, V> Cache<K, V> getCache(String cacheName)
+    public Cache<String, byte[]> getCache(String cacheName)
     {
-        return (Cache<K, V>) cacheMap.getOrDefault(cacheName, null);
+        return cacheMap.getOrDefault(cacheName, null);
     }
 
     @Override
@@ -41,9 +40,9 @@ public class XXCacheManager implements CacheManager
     }
 
     @Override
-    public <K, V> Cache<K, V> createCache(String cacheName, CacheProperties cacheProperties)
+    public Cache<String, byte[]> createCache(String cacheName, CacheProperties cacheProperties)
     {
-        Cache<K, V> cache = new XXCache<>(cacheProperties);
+        Cache<String, byte[]> cache = new XXCache(cacheProperties);
         cacheMap.put(cacheName, cache);
         LOGGER.info("XXCacheManager#createCache: Cache {} is created.", cacheName);
         return cache;
@@ -52,7 +51,7 @@ public class XXCacheManager implements CacheManager
     @Override
     public void destroyCache(String cacheName)
     {
-        Cache cache = cacheMap.get(cacheName);
+        Cache<String, byte[]> cache = cacheMap.get(cacheName);
         if(cache != null)
         {
             cache.close();

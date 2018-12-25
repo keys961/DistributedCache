@@ -11,7 +11,7 @@ public class XXCacheClientFallback implements XXCacheClient
     private static final Logger LOGGER = LoggerFactory.getLogger(XXCacheClientFallback.class);
 
     @Override
-    public Object get(String cacheName, String key)
+    public byte[] get(String cacheName, String key)
     {
         LOGGER.warn("Fetch cache error from: {} with key: {}.",
                 cacheName, key);
@@ -20,7 +20,7 @@ public class XXCacheClientFallback implements XXCacheClient
     }
 
     @Override
-    public Object put(String cacheName, String key, Object value)
+    public byte[] put(String cacheName, String key, byte[] value)
     {
         LOGGER.warn("Put cache error from: {} with key: {}.",
                 cacheName, key);
@@ -28,13 +28,13 @@ public class XXCacheClientFallback implements XXCacheClient
     }
 
     @Override
-    public String sayHello(String name)
+    public byte[] sayHello(String name)
     {
-        return "error";
+        return "error".getBytes();
     }
 
     @Override
-    public Object remove(String cacheName, String key)
+    public byte[] remove(String cacheName, String key)
     {
         LOGGER.warn("Remove cache error from: {} with key: {}.",
                 cacheName, key);

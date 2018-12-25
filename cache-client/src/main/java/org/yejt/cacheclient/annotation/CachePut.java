@@ -1,5 +1,7 @@
 package org.yejt.cacheclient.annotation;
 
+import org.yejt.cacheclient.codec.CacheCodec;
+import org.yejt.cacheclient.codec.DefaultCacheCodec;
 import org.yejt.cacheclient.condition.CacheCondition;
 import org.yejt.cacheclient.condition.DefaultCacheCondition;
 import org.yejt.cacheclient.keygen.DefaultKeyGenerator;
@@ -18,4 +20,6 @@ public @interface CachePut
     Class<? extends KeyGenerator> keyGenerator() default DefaultKeyGenerator.class;
 
     Class<? extends CacheCondition> condition() default DefaultCacheCondition.class;
+
+    Class<? extends CacheCodec> codec() default DefaultCacheCodec.class;
 }
