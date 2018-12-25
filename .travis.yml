@@ -5,12 +5,15 @@ branches:
     - master
 
 jdk:
-  - openjdk11
+  - oraclejdk8
 
-before_script:
+before_install:
   - cd cache-client
   - mvn install -DskipTests
   - cd ..
+
+install:
+  - mvn install -DskipTests
 
 script: mvn test
 
