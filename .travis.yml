@@ -1,6 +1,19 @@
 language: java
 
+branches:
+  only:
+    - master
+
 jdk:
-  - oraclejdk8
+  - openjdk11
 
+before_script:
+  - cd cache-client
+  - mvn install -DskipTests
+  - cd ..
 
+script: mvn test
+
+after_script:
+  - cd cache-demo
+  - mvn package -DskipTests
