@@ -7,16 +7,10 @@ branches:
 jdk:
   - openjdk11
 
-before_install:
-  - cd cache-client
-  - mvn install -DskipTests
-  - cd ..
+before_install: chmod 775 ./script/*
 
-install:
-  - mvn install -DskipTests
+install: ./script/build_cache.sh
 
-script: mvn test
+script: echo "All install done."
 
-after_script:
-  - cd cache-demo
-  - mvn package -DskipTests
+after_script: ./script/build_demo.sh
