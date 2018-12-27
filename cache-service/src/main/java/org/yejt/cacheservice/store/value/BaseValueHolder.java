@@ -28,8 +28,9 @@ public class BaseValueHolder<V> implements ValueHolder<V> {
 
     @Override
     public String toString() {
-        if (value == null)
+        if (value == null) {
             return null;
+        }
         return value.toString();
     }
 }

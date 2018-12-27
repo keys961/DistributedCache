@@ -23,17 +23,18 @@ public class ClusterNodeSender implements ApplicationRunner, DisposableBean {
 
     private final AmqpTemplate template;
 
-    private InstanceInfo instanceInfo;
+    private final ApplicationInfoManager infoManager;
 
     @Autowired
-    public ClusterNodeSender(AmqpTemplate template) {
+    public ClusterNodeSender(AmqpTemplate template, ApplicationInfoManager infoManager) {
         this.template = template;
+        this.infoManager = infoManager;
     }
 
     public void sendAddNodeMessage() {
         // send registry message to proxy
-        instanceInfo =
-                ApplicationInfoManager.getInstance().getInfo();
+        InstanceInfo instanceInfo =
+                infoManager.getInfo();
         template.convertAndSend(MqConfig.CACHE_NODE_EXCHANGE,
                 MqConfig.ADD_NODE_TOPIC, instanceInfo,
                 this::sendMessage);
@@ -41,6 +42,8 @@ public class ClusterNodeSender implements ApplicationRunner, DisposableBean {
 
     public void sendRemoveNodeMessage() {
         // send remove message to proxy
+        InstanceInfo instanceInfo =
+                infoManager.getInfo();
         template.convertAndSend(MqConfig.CACHE_NODE_EXCHANGE,
                 MqConfig.REMOVE_NODE_TOPIC, instanceInfo,
                 this::sendMessage);
@@ -62,7 +65,7 @@ public class ClusterNodeSender implements ApplicationRunner, DisposableBean {
     }
 
     @Override
-    public void destroy() throws Exception {
+    public void destroy() {
         sendRemoveNodeMessage();
     }
 }

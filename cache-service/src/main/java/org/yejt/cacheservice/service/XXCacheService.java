@@ -36,8 +36,9 @@ public class XXCacheService implements CacheService<String, byte[]> {
     @Override
     public Optional<byte[]> put(String cacheName, String key, byte[] value) {
         Cache<String, byte[]> cache = getCache(cacheName);
-        if (cache == null)
+        if (cache == null) {
             return Optional.empty();
+        }
         return Optional.ofNullable(cacheManager.getCache(cacheName).
                 put(key, value));
     }
@@ -45,16 +46,18 @@ public class XXCacheService implements CacheService<String, byte[]> {
     @Override
     public Optional<byte[]> get(String cacheName, String key) {
         Cache<String, byte[]> cache = getCache(cacheName);
-        if (cache == null)
+        if (cache == null) {
             return Optional.empty();
+        }
         return Optional.ofNullable(cacheManager.getCache(cacheName).get(key));
     }
 
     @Override
     public Optional<byte[]> remove(String cacheName, String key) {
         Cache<String, byte[]> cache = getCache(cacheName);
-        if (cache == null)
+        if (cache == null) {
             return Optional.empty();
+        }
         return Optional.ofNullable(cacheManager.getCache(cacheName).remove(key));
     }
 
@@ -66,8 +69,9 @@ public class XXCacheService implements CacheService<String, byte[]> {
     @Override
     public CacheProperties getCacheProperties(String cacheName) {
         Cache cache = cacheManager.getCache(cacheName);
-        if (cache != null)
+        if (cache != null) {
             return cache.getProperties();
+        }
         return null;
     }
 

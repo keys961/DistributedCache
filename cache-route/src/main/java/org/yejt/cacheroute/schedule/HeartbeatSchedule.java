@@ -44,9 +44,14 @@ public class HeartbeatSchedule {
                         .retrieve()
                         .bodyToFlux(Integer.class)
                         .blockLast();
-                if (status != null && (status == HttpStatus.OK.value() || status == HttpStatus.NO_CONTENT.value()))
-                    LOGGER.info("Server {} is still alive.", info.getInstanceId());
-                else {
+                if (status != null) {
+                    if (status == HttpStatus.OK.value() || status == HttpStatus.NO_CONTENT.value()) {
+                        LOGGER.info("Server {} is still alive.", info.getInstanceId());
+                    } else {
+                        removedSet.add(info);
+                        LOGGER.warn("Server {} is not alive.", info.getInstanceId());
+                    }
+                } else {
                     removedSet.add(info);
                     LOGGER.warn("Server {} is not alive.", info.getInstanceId());
                 }

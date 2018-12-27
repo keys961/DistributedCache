@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 public class CacheEndpoint {
+
     @Value("${server.port}")
     private int port;
 
@@ -32,10 +33,14 @@ public class CacheEndpoint {
 
     @GetMapping(value = "/{cacheName}/{key}")
     public Mono<byte[]> get(@PathVariable String cacheName, @PathVariable String key) {
-        byte[] cachedValue = cacheService.get(cacheName, key).orElse(null);
-        if (cachedValue == null)
-            return Mono.empty();
-        return Mono.just(cachedValue);
+        return Mono.create(emitter -> {
+            byte[] cachedValue = cacheService.get(cacheName, key).orElse(null);
+            if (cachedValue == null) {
+                emitter.success();
+            } else {
+                emitter.success(cachedValue);
+            }
+        });
     }
 
     /**
@@ -50,10 +55,14 @@ public class CacheEndpoint {
 
     @DeleteMapping(value = "/{cacheName}/{key}")
     public Mono<byte[]> remove(@PathVariable String cacheName, @PathVariable String key) {
-        byte[] cachedValue = cacheService.remove(cacheName, key).orElse(null);
-        if (cachedValue == null)
-            return Mono.empty();
-        return Mono.just(cachedValue);
+        return Mono.create(emitter -> {
+            byte[] cachedValue = cacheService.remove(cacheName, key).orElse(null);
+            if (cachedValue == null) {
+                emitter.success();
+            } else {
+                emitter.success(cachedValue);
+            }
+        });
     }
 
     @GetMapping(value = "/props")

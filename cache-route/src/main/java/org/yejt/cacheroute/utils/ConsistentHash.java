@@ -21,8 +21,9 @@ public class ConsistentHash {
         hash ^= hash >> 17;
         hash += hash << 5;
 
-        if (hash < 0)
+        if (hash < 0) {
             hash = Math.abs(hash);
+        }
 
         return hash;
     }

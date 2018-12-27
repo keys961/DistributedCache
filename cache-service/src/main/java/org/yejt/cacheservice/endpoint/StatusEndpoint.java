@@ -4,6 +4,7 @@ import com.netflix.appinfo.ApplicationInfoManager;
 import com.netflix.appinfo.InstanceInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,10 +19,17 @@ import reactor.core.publisher.Mono;
 public class StatusEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(StatusEndpoint.class);
 
+    private final ApplicationInfoManager infoManager;
+
+    @Autowired
+    public StatusEndpoint(ApplicationInfoManager infoManager) {
+        this.infoManager = infoManager;
+    }
+
     @GetMapping(value = "/health")
     public Mono<Integer> health() {
         try {
-            InstanceInfo myInfo = ApplicationInfoManager.getInstance().getInfo();
+            InstanceInfo myInfo = infoManager.getInfo();
             switch (myInfo.getStatus()) {
                 case UP:
                     return Mono.just(HttpStatus.OK.value());

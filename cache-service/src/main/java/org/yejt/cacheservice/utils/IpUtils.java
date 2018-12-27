@@ -19,8 +19,9 @@ public class IpUtils {
     }
 
     public static int getPort(String instanceId) {
-        if (instanceId == null)
+        if (instanceId == null) {
             return 0;
+        }
         return Integer.parseInt(instanceId.split(":")[2]);
     }
 }

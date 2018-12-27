@@ -18,6 +18,8 @@ import java.util.concurrent.TimeUnit;
 public class UserServiceRunner {
     private final UserService userService;
 
+    private static final int TWO = 2;
+
     private Set<User> users = new HashSet<>();
 
     @Autowired
@@ -53,7 +55,7 @@ public class UserServiceRunner {
                 e.printStackTrace();
             }
 
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < TWO; i++) {
                 for (User user : users) {
                     User u = null;
                     try {

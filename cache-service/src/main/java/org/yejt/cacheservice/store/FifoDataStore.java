@@ -59,12 +59,14 @@ public class FifoDataStore<K, V> implements DataStore<K, V> {
         ValueHolder<V> oldValue, newValue = new BaseValueHolder<>(value);
         try {
             lock.writeLock().lock();
-            if (count >= capacity)
+            if (count >= capacity) {
                 removeEntry();
+            }
             oldValue = cache.get(key);
             cache.put(key, newValue);
-            if (oldValue == null)
+            if (oldValue == null) {
                 count++;
+            }
         } finally {
             lock.writeLock().unlock();
         }
@@ -79,8 +81,9 @@ public class FifoDataStore<K, V> implements DataStore<K, V> {
 
             holder = cache.remove(key);
 
-            if (holder != null)
+            if (holder != null) {
                 count--;
+            }
         } finally {
             lock.writeLock().unlock();
         }
@@ -101,8 +104,9 @@ public class FifoDataStore<K, V> implements DataStore<K, V> {
 
     private void removeEntry() {
         // double check
-        if (count < capacity || cache.isEmpty())
+        if (count < capacity || cache.isEmpty()) {
             return;
+        }
 
         K key = findFirstEntry();
         cache.remove(key);
