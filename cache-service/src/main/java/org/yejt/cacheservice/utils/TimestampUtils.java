@@ -1,5 +1,6 @@
 package org.yejt.cacheservice.utils;
 
+import com.netflix.appinfo.InstanceInfo;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -8,33 +9,36 @@ import java.io.*;
  * @author keys961
  */
 public class TimestampUtils {
-    private static final File TIMESTAMP_FILE = new File("timestamp.file");
 
-    public static long getTimestamp() throws IOException {
-        if (!TIMESTAMP_FILE.exists()) {
-            if (TIMESTAMP_FILE.createNewFile()) {
-                return writeTimestamp(0);
+    public static long getTimestamp(InstanceInfo instanceInfo) throws IOException {
+        File timestampFile = getTimestampFile(instanceInfo);
+        if (!timestampFile.exists()) {
+            if (timestampFile.createNewFile()) {
+                return writeTimestamp(timestampFile, 0);
             }
             throw new IOException("Record timestamp file failed.");
         }
-        BufferedReader reader = new BufferedReader(new FileReader(TIMESTAMP_FILE));
+        BufferedReader reader = new BufferedReader(new FileReader(timestampFile));
         long timestamp = Long.parseLong(reader.readLine());
         reader.close();
 
-        FileUtils.forceDelete(TIMESTAMP_FILE);
-        if (TIMESTAMP_FILE.createNewFile()) {
-            return writeTimestamp(++timestamp);
+        FileUtils.forceDelete(timestampFile);
+        if (timestampFile.createNewFile()) {
+            return writeTimestamp(timestampFile, ++timestamp);
         }
 
         throw new IOException("Record timestamp file failed.");
     }
 
-    public static File getTimestampFile() {
-        return TIMESTAMP_FILE;
+    public static File getTimestampFile(InstanceInfo info) {
+        if (info == null) {
+            return new File("timestamp.file");
+        }
+        return new File(info.getId());
     }
 
-    private static long writeTimestamp(long timestamp) throws IOException {
-        PrintWriter writer = new PrintWriter(TIMESTAMP_FILE);
+    private static long writeTimestamp(File timestampFile, long timestamp) throws IOException {
+        PrintWriter writer = new PrintWriter(timestampFile);
         writer.print(timestamp);
         writer.flush();
         writer.close();

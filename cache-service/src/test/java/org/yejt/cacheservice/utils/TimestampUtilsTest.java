@@ -18,7 +18,7 @@ public class TimestampUtilsTest {
 
     @Before
     public void init() {
-        timestampFile = TimestampUtils.getTimestampFile();
+        timestampFile = TimestampUtils.getTimestampFile(null);
     }
 
     @After
@@ -30,7 +30,7 @@ public class TimestampUtilsTest {
     @Test
     public void testGetTimestamp() throws IOException {
         for (long i = 0; i < 10; i++) {
-            long timestamp = TimestampUtils.getTimestamp();
+            long timestamp = TimestampUtils.getTimestamp(null);
             LOGGER.info("Timestamp: {}.", timestamp);
             Assert.assertEquals(i, timestamp);
         }

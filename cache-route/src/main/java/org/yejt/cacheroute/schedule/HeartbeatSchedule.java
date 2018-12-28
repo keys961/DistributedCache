@@ -30,7 +30,7 @@ public class HeartbeatSchedule {
         this.heartBeatClient = heartBeatClient;
     }
 
-    @Scheduled(initialDelay = 60000L, fixedDelayString = "${loadBalance.interval:60000}")
+    @Scheduled(initialDelay = 30000L, fixedDelayString = "${loadBalance.interval:30000}")
     public void heartBeatSchedule() {
         Set<InstanceInfo> instanceInfoSet = ServiceMapUtils.getServerSet();
         Set<InstanceInfo> removedSet = new HashSet<>();

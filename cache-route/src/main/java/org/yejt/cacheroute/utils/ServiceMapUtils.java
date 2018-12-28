@@ -15,9 +15,6 @@ public class ServiceMapUtils {
 
     private static Set<InstanceInfo> serverSet = new HashSet<>();
 
-    /**
-     * TODO: Need to persist that...
-     **/
     private static long version = -1L;
 
     public static TreeMap<Integer, InstanceInfo> getServerTreeMap() {
@@ -59,8 +56,7 @@ public class ServiceMapUtils {
     }
 
     public static synchronized void removeServerForcely(Set<InstanceInfo> set) {
-        set.forEach(server ->
-        {
+        set.forEach(server -> {
             serverTreeMap.keySet().
                     removeIf(hashVal -> serverTreeMap.get(hashVal).equals(server));
             serverSet.remove(server);

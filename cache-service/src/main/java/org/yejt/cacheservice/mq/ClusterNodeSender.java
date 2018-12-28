@@ -52,7 +52,7 @@ public class ClusterNodeSender implements ApplicationRunner, DisposableBean {
     private Message sendMessage(Message message) {
         try {
             message.getMessageProperties().setHeader(TIMESTAMP,
-                    TimestampUtils.getTimestamp());
+                    TimestampUtils.getTimestamp(infoManager.getInfo()));
         } catch (IOException e) {
             message.getMessageProperties().setHeader(TIMESTAMP, 0);
         }

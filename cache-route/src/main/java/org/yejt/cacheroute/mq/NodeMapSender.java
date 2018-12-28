@@ -29,8 +29,7 @@ public class NodeMapSender {
 
         template.convertAndSend(MqConfig.CACHE_NODE_EXCHANGE,
                 MqConfig.NODE_MAP_TOPIC, nodeMap,
-                message ->
-                {
+                message -> {
                     message.getMessageProperties().setHeader(VERSION,
                             version);
                     return message;
