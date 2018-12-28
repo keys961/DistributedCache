@@ -8,7 +8,8 @@ cd ./cache-registry && mvn package && cd .. && \
 echo "cache-registry build success." && \
 echo "Building cache-route..." && \
 cd ./cache-route && mvn package && cd .. && \
-echo "cache route build success." && \
-echo "Building cache-service..." && \
-cd ./cache-service && mvn package && cd .. && \
-echo "cache-service build success."
+echo "cache route build success."
+# echo "cache route build success." && \
+# echo "Building cache-service..." && \
+# cd ./cache-service && mvn package && cd .. && \
+# echo "cache-service build success."
