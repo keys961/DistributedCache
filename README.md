@@ -1,5 +1,7 @@
 # README - `XXCache`
 
+[![Build Status](https://travis-ci.org/keys961/DistributedCache.svg?branch=master)](https://travis-ci.org/keys961/DistributedCache)
+
 > This is a project of distributed K-V cache (in the future it may support graph database).
 >
 > It is based on Spring Cloud.
