@@ -9,7 +9,8 @@ import org.springframework.web.reactive.function.client.WebClient;
  */
 @Configuration
 public class HeartbeatConfig {
-    @Bean
+
+    @Bean(value = "heartBeatWebClient")
     public WebClient heartBeatWebClient() {
         return WebClient.create();
     }

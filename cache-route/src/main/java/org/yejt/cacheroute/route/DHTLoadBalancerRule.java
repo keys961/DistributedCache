@@ -55,8 +55,7 @@ public class DHTLoadBalancerRule implements LoadBalancerRule {
         }
 
         final Server[] result = {null};
-        serverList.forEach(server ->
-        {
+        serverList.forEach(server -> {
             InstanceInfo info = ((DiscoveryEnabledServer) server).getInstanceInfo();
             if (properties.getAppName().equals(info.getAppName())
                     && Integer.parseInt(properties.getInstanceId().split(":")[2])

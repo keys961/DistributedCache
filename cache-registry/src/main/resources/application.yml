@@ -13,6 +13,8 @@ eureka:
     fetch-registry: false # mark itself as a center server
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+  server:
+    enable-self-preservation: false
 
 spring:
   application:

@@ -21,8 +21,15 @@ public class ServiceMapUtils {
         return serverTreeMap;
     }
 
-    public static void setServerTreeMap(TreeMap<Integer, InstanceInfo> serverTreeMap) {
+    public static synchronized void setServerTreeMap(TreeMap<Integer, InstanceInfo> serverTreeMap) {
         ServiceMapUtils.serverTreeMap = serverTreeMap;
+        ServiceMapUtils.serverSet = new HashSet<>(serverTreeMap.values());
+        ServiceMapUtils.serverSet.forEach(info -> {
+            if (!serverTimestamp.containsKey(info)) {
+                serverTimestamp.put(info, 0L);
+            }
+        });
+        version++;
     }
 
     public static synchronized void addServer(Collection<Integer> hashVals,
@@ -50,19 +57,20 @@ public class ServiceMapUtils {
         }
     }
 
+    public static synchronized void removeServerForcly(InstanceInfo server) {
+        Long timestamp = serverTimestamp.get(server);
+        if (timestamp == null) {
+            timestamp = 0L;
+        }
+        serverTimestamp.put(server, timestamp);
+        serverTreeMap.entrySet().removeIf(entry -> entry.getValue().equals(server));
+        serverSet.remove(server);
+        version++;
+    }
+
     @Deprecated
     public static synchronized void removeServer(Map<InstanceInfo, Long> serverSet) {
         serverSet.forEach(ServiceMapUtils::removeServer);
-    }
-
-    public static synchronized void removeServerForcely(Set<InstanceInfo> set) {
-        set.forEach(server -> {
-            serverTreeMap.keySet().
-                    removeIf(hashVal -> serverTreeMap.get(hashVal).equals(server));
-            serverSet.remove(server);
-            // without update timestamp
-            version++;
-        });
     }
 
     public static Set<InstanceInfo> getServerSet() {

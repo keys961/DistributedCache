@@ -1,6 +1,8 @@
 eureka:
   client:
     serviceUrl:
+      # Url fetching all the instances of the cache service
+      registryUrl: http://localhost:20000/service-instances/CACHE-SERVICE
       defaultZone: http://localhost:20000/eureka
 server:
   port: 8080
